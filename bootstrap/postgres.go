@@ -52,10 +52,9 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 	CREATE TABLE IF NOT EXISTS comment (
 		id UUID PRIMARY KEY,
 		comment VARCHAR(2000),
-		author_id UUID NOT NULL FOREIGN KEY REFERENCES "user"(id),
+		author_id UUID NOT NULL,
 		item_id UUID NOT NULL,
-		FOREIGN KEY (author_id) 
-
+		FOREIGN KEY (author_id) REFERENCES "user"(id)
 	);`)
 	if err != nil {	log.Fatalf("%s: %v", op, err) }
 	_, err = createCommentTable.Exec()
