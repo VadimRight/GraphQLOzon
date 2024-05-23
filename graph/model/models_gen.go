@@ -31,3 +31,9 @@ type Post struct {
 	Text     string `json:"text"`
 	AuthorID string `json:"authorId"`
 }
+
+type Comment struct {
+	ID       string `json:"id"`
+	Comment  string `json:"comment"`
+	AuthorID string `json:"authorId"`
+}

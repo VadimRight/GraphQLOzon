@@ -111,3 +111,61 @@ func (r *mutationResolver) DeletePost(ctx context.Context, id string) (*model.Po
 	}
 	return &post, nil
 }
+
+func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) {
+	rows, err := r.DB.QueryContext(ctx, "SELECT id, comment, author_id FROM comment")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var comments []*model.Comment
+	for rows.Next() {
+		var comment model.Comment
+		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID); err != nil {
+			return nil, err
+		}
+		comments = append(comments, &comment)
+	}
+	return comments, nil
+}
+
+func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
+	var comment model.Comment
+	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+	return &comment, nil
+}
+
+func (r *mutationResolver) CreateComment(ctx context.Context, comment string, authorId string) (*model.Comment, error) {
+	id := uuid.New().String()
+	_, err := r.DB.ExecContext(ctx, "INSERT INTO comment (id, comment, author_id) VALUES ($1, $2, $3)", id, comment, authorId)
+	if err != nil {
+		return nil, err
+	}
+	return &model.Comment{ID: id, Comment: comment, AuthorID: authorId}, nil
+}
+
+func (r *mutationResolver) UpdateComment(ctx context.Context, id string, comment string) (*model.Comment, error) {
+	_, err := r.DB.ExecContext(ctx, "UPDATE comment SET comment=$2 WHERE id=$1", id, comment)
+	if err != nil {
+		return nil, err
+	}
+	return &model.Comment{ID: id, Comment: comment}, nil
+}
+
+func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (*model.Comment, error) {
+	var comment model.Comment
+	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+	_, err = r.DB.ExecContext(ctx, "DELETE FROM comment WHERE id=$1", id)
+	if err != nil {
+		return nil, err
+	}
+	return &comment, nil
+}
+
