@@ -28,7 +28,7 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 		log.Fatalf("%s: %v", op, err)
 	}
 	createUserTable, err := db.Prepare(`
-	CREATE TABLE IF NOT EXISTS "user" (
+	CREATE TABLE IF NOT EXISTS users (
 		id UUID PRIMARY KEY,
 		username VARCHAR(20) NOT NULL UNIQUE,
 		password CHAR(60) NOT NULL UNIQUE
@@ -42,7 +42,7 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 		id UUID PRIMARY KEY,
 		text TEXT NOT NULL,
 		author_id UUID NOT NULL,
-		FOREIGN KEY (author_id) REFERENCES "user"(id));
+		FOREIGN KEY (author_id) REFERENCES users(id));
 	`)	
 	if err != nil {	log.Fatalf("%s: %v", op, err) }
 	_, err = createPostTable.Exec()
@@ -54,7 +54,7 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 		comment VARCHAR(2000),
 		author_id UUID NOT NULL,
 		item_id UUID NOT NULL,
-		FOREIGN KEY (author_id) REFERENCES "user"(id)
+		FOREIGN KEY (author_id) REFERENCES users(id)
 	);`)
 	if err != nil {	log.Fatalf("%s: %v", op, err) }
 	_, err = createCommentTable.Exec()
