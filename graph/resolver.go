@@ -33,7 +33,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	var users []*model.User
 	for rows.Next() {
 		var user model.User
-		if err := rows.Scan(&user.ID, &user.Username, &user.Password); err != nil {
+		if err := rows.Scan(&user.ID, &user.Name, &user.Password); err != nil {
 			return nil, err
 		}
 		users = append(users, &user)
@@ -43,7 +43,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
 	var user model.User
-	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username, &user.Password)
+	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE id=$1", id).Scan(&user.ID, &user.Name, &user.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, username string, pass
 	if err != nil {
 		return nil, err
 	}
-	return &model.User{ID: id, Username: username, Password: password}, nil
+	return &model.User{ID: id, Name: username, Password: password}, nil
 }
 
 func (r *mutationResolver) UpdateUser(ctx context.Context, id string, username string, password string) (*model.User, error) {
@@ -66,12 +66,12 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, id string, username s
 	if err != nil {
 		return nil, err
 	}
-	return &model.User{ID: id, Username: username, Password: password}, nil
+	return &model.User{ID: id, Name: username, Password: password}, nil
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.User, error) {
 	var user model.User
-	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username, &user.Password)
+	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE id=$1", id).Scan(&user.ID, &user.Name, &user.Password)
 	if err != nil {
 		return nil, err
 	}
