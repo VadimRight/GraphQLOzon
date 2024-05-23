@@ -9,7 +9,7 @@ import (
 
 // Тип базы данных
 type Storage struct {
-	db *sql.DB
+	DB *sql.DB
 }
 
 // Функция инициализации базы данных и подключение к базе данных
@@ -59,10 +59,10 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 	_, err = createCommentTable.Exec()
 	if err != nil {	log.Fatalf("%s: %v", op, err) }
 
-	return &Storage{db: db}
+	return &Storage{DB: db}
 }
 
 // Функция закрытия соединения с базой данных
 func CloseDB(db *Storage) error {
-	return db.db.Close()
+	return db.DB.Close()
 }
