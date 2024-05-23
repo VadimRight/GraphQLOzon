@@ -1,10 +1,13 @@
-# schema.graphqls
+# Определение типа User с его полями и связями
 type User {
   id: ID!
   username: String!
   password: String!
+  posts: [Post!]!
+  comments: [Comment!]!
 }
 
+# Определение типа Post с его полями и связями
 type Post {
   id: ID!
   text: String!
@@ -12,6 +15,7 @@ type Post {
   author: User!
 }
 
+# Определение типа Comment с его полями и связями
 type Comment {
   id: ID!
   comment: String!
@@ -20,22 +24,59 @@ type Comment {
   author: User!
 }
 
+# Определение запросов, связанных с User
 type UserQuery {
   users: [User!]!
   user(id: ID!): User
 }
 
+# Определение запросов, связанных с Post
 type PostQuery {
   posts: [Post!]!
   post(id: ID!): Post
 }
 
+# Определение запросов, связанных с Comment
 type CommentQuery {
   comments: [Comment!]!
   comment(id: ID!): Comment
 }
 
+# Определение мутаций, связанных с User
+type UserMutation {
+  createUser(username: String!, password: String!): User!
+  updateUser(id: ID!, username: String!, password: String!): User!
+  deleteUser(id: ID!): User!
+}
+
+# Определение мутаций, связанных с Post
+type PostMutation {
+  createPost(text: String!, authorId: ID!): Post!
+  updatePost(id: ID!, text: String!): Post!
+  deletePost(id: ID!): Post!
+}
+
+# Определение мутаций, связанных с Comment
+type CommentMutation {
+  createComment(comment: String!, authorId: ID!, itemId: ID!): Comment!
+  updateComment(id: ID!, comment: String!): Comment!
+  deleteComment(id: ID!): Comment!
+}
+
+# Корневой тип Query, агрегирующий все запросы
+type Query {
+  userQuery: UserQuery
+  postQuery: PostQuery
+  commentQuery: CommentQuery
+}
+
+# Корневой тип Mutation, агрегирующий все мутации
 type Mutation {
+  userMutation: UserMutation
+  postMutation: PostMutation
+  commentMutation: CommentMutation
+
+  # Упрощенные мутации для удобного доступа (опционально)
   createUser(username: String!, password: String!): User!
   updateUser(id: ID!, username: String!, password: String!): User!
   deleteUser(id: ID!): User!
@@ -44,7 +85,8 @@ type Mutation {
   updatePost(id: ID!, text: String!): Post!
   deletePost(id: ID!): Post!
 
-  createComment(comment: String!, authorId: ID!): Comment!
+  createComment(comment: String!, authorId: ID!, itemId: ID!): Comment!
   updateComment(id: ID!, comment: String!): Comment!
   deleteComment(id: ID!): Comment!
 }
+

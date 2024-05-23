@@ -82,6 +82,33 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.Us
 	return &user, nil
 }
 
+func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
+	rows, err := r.DB.QueryContext(ctx, "SELECT id, text, author_id FROM post")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []*model.Post
+	for rows.Next() {
+		var post model.Post
+		if err := rows.Scan(&post.ID, &post.Text, &post.AuthorID); err != nil {
+			return nil, err
+		}
+		posts = append(posts, &post)
+	}
+	return posts, nil
+}
+
+func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
+	var post model.Post
+	err := r.DB.QueryRowContext(ctx, "SELECT id, text, author_id FROM post WHERE id=$1", id).Scan(&post.ID, &post.Text, &post.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+	return &post, nil
+}
+
 func (r *mutationResolver) CreatePost(ctx context.Context, text string, authorId string) (*model.Post, error) {
 	id := uuid.New().String()
 	_, err := r.DB.ExecContext(ctx, "INSERT INTO post (id, text, author_id) VALUES ($1, $2, $3)", id, text, authorId)
