@@ -21,6 +21,19 @@ type Todo struct {
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID string `json:"id"`
+	Name string `json:"username"`
+	Password string `json:"password"`
+}
+
+type Post struct {
+	ID       string `json:"id"`
+	Text     string `json:"text"`
+	AuthorID string `json:"authorId"`
+}
+
+type Comment struct {
+	ID       string `json:"id"`
+	Comment  string `json:"comment"`
+	AuthorID string `json:"authorId"`
 }

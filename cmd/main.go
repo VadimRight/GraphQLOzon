@@ -9,5 +9,5 @@ func main() {
 	cfg := bootstrap.LoadConfig()
 	db := bootstrap.InitPostgresDatabase(cfg)
 	defer bootstrap.CloseDB(db)
-	api.InitServer(cfg)	
+	api.InitServer(cfg, db)	
 }
