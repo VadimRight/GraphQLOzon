@@ -1,13 +1,14 @@
-
 // resolver/resolver.go
 package graph
 
 import (
 	"context"
-	"github.com/VadimRight/GraphQLOzon/graph/model"
 	"database/sql"
-	"github.com/google/uuid"
+	"log"
+	"errors"
+	"github.com/VadimRight/GraphQLOzon/graph/model"
 	"github.com/VadimRight/GraphQLOzon/internal/service"
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
 
@@ -66,7 +67,7 @@ func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*m
 	return &user, nil
 }
 
-func (r *mutationResolver) LoginUser(ctx context.Context, username string, password string) (*model.User, error) {
+func (r *mutationResolver) LoginUser(ctx context.Context, username string, password string) (interface{}, error) {
 	getUser, err := r.UserService.GetUserByUsername(ctx, username)
 	if err != nil {
 		if postgresErr, ok := err.(*pq.Error); ok {
@@ -74,16 +75,25 @@ func (r *mutationResolver) LoginUser(ctx context.Context, username string, passw
 		}				
 		return nil, err
 	}
-	return getUser, nil
-}
-
-func (r *mutationResolver) CreateUser(ctx context.Context, username string, password string) (*model.User, error) {
-	id := uuid.New().String()
-	_, err := r.DB.ExecContext(ctx, "INSERT INTO users (id, username, password) VALUES ($1, $2, $3)", id, username, password)
+	if getUser.Password != password {
+		return nil, errors.New("Password incorect")
+	}
+	token, err := service.JwtGenerate(ctx, getUser.ID)
 	if err != nil {
 		return nil, err
 	}
-	return &model.User{ID: id, Username: username, Password: password}, nil
+	return map[string]interface{}{
+		"token": token,
+	}, nil
+}
+
+func (r *mutationResolver) RegisterUser(ctx context.Context, username string, password string) (*model.User, error) {
+	_, err := r.UserService.GetUserByUsername(ctx, username)
+	if err == nil {
+		return nil, errors.New("user already exists")
+	}
+	createdUser, err := r.UserService.UserCreate(ctx, username, password)
+	return &model.User{ID: createdUser.ID, Username: username, Password: password}, nil
 }
 
 func (r *mutationResolver) UpdateUserUsername(ctx context.Context, id string, username string) (*model.User, error) {
