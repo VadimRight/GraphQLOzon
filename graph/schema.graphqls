@@ -16,6 +16,7 @@ type Comment {
   id: ID!
   comment: String!
   authorId: ID!
+  itemId: ID!
   author: User!
 }
 
