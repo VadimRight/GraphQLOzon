@@ -24,59 +24,17 @@ type Comment {
   author: User!
 }
 
-# Определение запросов, связанных с User
-type UserQuery {
-  users: [User!]!
-  user(id: ID!): User
-}
 
-# Определение запросов, связанных с Post
-type PostQuery {
-  posts: [Post!]!
-  post(id: ID!): Post
-}
-
-# Определение запросов, связанных с Comment
-type CommentQuery {
-  comments: [Comment!]!
-  comment(id: ID!): Comment
-}
-
-# Определение мутаций, связанных с User
-type UserMutation {
+# Корневой тип Query, агрегирующий все запросы
+type Query {
   createUser(username: String!, password: String!): User!
   updateUserName(id: ID!, username: String!): User!
   updateUserPassword(id: ID!, password: String!): User!
   deleteUser(id: ID!): User!
 }
 
-# Определение мутаций, связанных с Post
-type PostMutation {
-  createPost(text: String!, authorId: ID!): Post!
-  updatePost(id: ID!, text: String!): Post!
-  deletePost(id: ID!): Post!
-}
-
-# Определение мутаций, связанных с Comment
-type CommentMutation {
-  createComment(comment: String!, authorId: ID!, itemId: ID!): Comment!
-  updateComment(id: ID!, comment: String!): Comment!
-  deleteComment(id: ID!): Comment!
-}
-
-# Корневой тип Query, агрегирующий все запросы
-type Query {
-  userQuery: UserQuery
-  postQuery: PostQuery
-  commentQuery: CommentQuery
-}
-
 # Корневой тип Mutation, агрегирующий все мутации
 type Mutation {
-  userMutation: UserMutation
-  postMutation: PostMutation
-  commentMutation: CommentMutation
-
   # Упрощенные мутации для удобного доступа (опционально)
   createUser(username: String!, password: String!): User!
   updateUserName(id: ID!, username: String!): User!
