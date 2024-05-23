@@ -23,6 +23,8 @@ func (r *Resolver) Mutation() MutationResolver {
 
 type queryResolver struct{ *Resolver }
 
+type mutationResolver struct{ *Resolver }
+
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	rows, err := r.DB.QueryContext(ctx, "SELECT id, username, password FROM users")
 	if err != nil {
@@ -50,7 +52,24 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 	return &user, nil
 }
 
-type mutationResolver struct{ *Resolver }
+
+func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*model.User, error) {
+	var user model.User
+	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE username=$1", username).Scan(&user.ID, &user.Username, &user.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *mutationResolver) LoginUser(ctx context.Context, username string, password string) (*model.User, error) {
+	getUser, err := UserByUsername(ctx, username)
+	if err != nil {
+		if postgresErr, ok := err.(*pq.Error); ok {
+    			return nil, postgresErr
+		}				
+	}
+}
 
 func (r *mutationResolver) CreateUser(ctx context.Context, username string, password string) (*model.User, error) {
 	id := uuid.New().String()
