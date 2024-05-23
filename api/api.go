@@ -7,6 +7,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/VadimRight/GraphQLOzon/graph"
 	"github.com/VadimRight/GraphQLOzon/bootstrap"
+	"log"
 )
 
 func InitServer(cfg *bootstrap.Config, storage *bootstrap.Storage) {	
@@ -14,6 +15,8 @@ func InitServer(cfg *bootstrap.Config, storage *bootstrap.Storage) {
 	r.POST("/query", graphqlHandler(storage))
 	r.GET("/", playgroundHandler())
 	r.Run(cfg.Server.ServerAddress)
+	log.Println("connect to http://localhost:8080/ for GraphQL playground")
+	log.Fatal(r.Run(":8080"))
 }
 
 func graphqlHandler(storage *bootstrap.Storage) gin.HandlerFunc {
