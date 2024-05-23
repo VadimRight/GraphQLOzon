@@ -2,40 +2,31 @@
 
 package model
 
-type Mutation struct {
-}
-
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
-}
-
-type Query struct {
-}
-
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
-}
-
-type User struct {
-	ID string `json:"id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type Post struct {
-	ID       string `json:"id"`
-	Text     string `json:"text"`
-	AuthorID string `json:"authorId"`
-}
-
 type Comment struct {
 	ID       string `json:"id"`
 	Comment  string `json:"comment"`
 	AuthorID string `json:"authorId"`
 	ItemID   string `json:"itemId"`
 	Author   *User  `json:"author"`
+}
+
+type Mutation struct {
+}
+
+type Post struct {
+	ID       string `json:"id"`
+	Text     string `json:"text"`
+	AuthorID string `json:"authorId"`
+	Author   *User  `json:"author"`
+}
+
+type Query struct {
+}
+
+type User struct {
+	ID       string     `json:"id"`
+	Username string     `json:"username"`
+	Password string     `json:"password"`
+	Posts    []*Post    `json:"posts"`
+	Comments []*Comment `json:"comments"`
 }
