@@ -13,7 +13,7 @@ func InitServer(cfg *bootstrap.Config) {
 	r := gin.Default()
 	r.POST("/query", graphqlHandler())
 	r.GET("/", playgroundHandler())
-	r.Run(cfg.Server.ServerPort)
+	r.Run(cfg.Server.ServerAddress)
 }
 
 func graphqlHandler() gin.HandlerFunc {
