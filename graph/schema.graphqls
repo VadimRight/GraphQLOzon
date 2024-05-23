@@ -33,7 +33,8 @@ type Query {
 
 type Mutation {
   createUser(username: String!, password: String!): User!
-  updateUser(id: ID!, username: String!, password: String!): User!
+  updateUserUsername(id: ID!, username: String!): User!
+  updateUserPassword(id: ID!, password: String!): User!
   deleteUser(id: ID!): User!
 
   createPost(text: String!, authorId: ID!): Post!
