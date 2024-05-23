@@ -5,7 +5,6 @@ package graph
 import (
 	"context"
 	"github.com/VadimRight/GraphQLOzon/domain"
-	"github.com/VadimRight/GraphQLOzon/graph"	
 	"database/sql"
 	"github.com/google/uuid"
 )
@@ -14,11 +13,11 @@ type Resolver struct{
 	DB *sql.DB
 }
 
-func (r *Resolver) Query() graph.QueryResolver {
+func (r *Resolver) Query() QueryResolver {
 	return &queryResolver{r}
 }
 
-func (r *Resolver) Mutation() graph.MutationResolver {
+func (r *Resolver) Mutation() MutationResolver {
 	return &mutationResolver{r}
 }
 
