@@ -113,7 +113,7 @@ func (r *mutationResolver) DeletePost(ctx context.Context, id string) (*model.Po
 }
 
 func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) {
-	rows, err := r.DB.QueryContext(ctx, "SELECT id, comment, author_id FROM comment")
+	rows, err := r.DB.QueryContext(ctx, "SELECT id, comment, author_id, item_id FROM comment")
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) 
 	var comments []*model.Comment
 	for rows.Next() {
 		var comment model.Comment
-		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID); err != nil {
+		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.ItemID); err != nil {
 			return nil, err
 		}
 		comments = append(comments, &comment)
@@ -132,20 +132,20 @@ func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) 
 
 func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
 	var comment model.Comment
-	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID)
+	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, item_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.ItemID)
 	if err != nil {
 		return nil, err
 	}
 	return &comment, nil
 }
 
-func (r *mutationResolver) CreateComment(ctx context.Context, comment string, authorId string) (*model.Comment, error) {
+func (r *mutationResolver) CreateComment(ctx context.Context, comment string, authorId string, itemId string) (*model.Comment, error) {
 	id := uuid.New().String()
-	_, err := r.DB.ExecContext(ctx, "INSERT INTO comment (id, comment, author_id) VALUES ($1, $2, $3)", id, comment, authorId)
+	_, err := r.DB.ExecContext(ctx, "INSERT INTO comment (id, comment, author_id, item_id) VALUES ($1, $2, $3, $4)", id, comment, authorId, itemId)
 	if err != nil {
 		return nil, err
 	}
-	return &model.Comment{ID: id, Comment: comment, AuthorID: authorId}, nil
+	return &model.Comment{ID: id, Comment: comment, AuthorID: authorId, ItemID: itemId}, nil
 }
 
 func (r *mutationResolver) UpdateComment(ctx context.Context, id string, comment string) (*model.Comment, error) {
@@ -158,7 +158,7 @@ func (r *mutationResolver) UpdateComment(ctx context.Context, id string, comment
 
 func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (*model.Comment, error) {
 	var comment model.Comment
-	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID)
+	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, item_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.ItemID)
 	if err != nil {
 		return nil, err
 	}
