@@ -45,7 +45,8 @@ type CommentQuery {
 # Определение мутаций, связанных с User
 type UserMutation {
   createUser(username: String!, password: String!): User!
-  updateUser(id: ID!, username: String!, password: String!): User!
+  updateUserName(id: ID!, username: String!): User!
+  updateUserPassword(id: ID!, password: String!): User!
   deleteUser(id: ID!): User!
 }
 
@@ -78,7 +79,8 @@ type Mutation {
 
   # Упрощенные мутации для удобного доступа (опционально)
   createUser(username: String!, password: String!): User!
-  updateUser(id: ID!, username: String!, password: String!): User!
+  updateUserName(id: ID!, username: String!): User!
+  updateUserPassword(id: ID!, password: String!): User!
   deleteUser(id: ID!): User!
 
   createPost(text: String!, authorId: ID!): Post!

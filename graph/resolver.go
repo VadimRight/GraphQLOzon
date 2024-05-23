@@ -61,12 +61,20 @@ func (r *mutationResolver) CreateUser(ctx context.Context, username string, pass
 	return &model.User{ID: id, Name: username, Password: password}, nil
 }
 
-func (r *mutationResolver) UpdateUser(ctx context.Context, id string, username string, password string) (*model.User, error) {
-	_, err := r.DB.ExecContext(ctx, "UPDATE users SET username=$2, password=$3 WHERE id=$1", id, username, password)
+func (r *mutationResolver) UpdateUserName(ctx context.Context, id string, username string) (*model.User, error) {
+	_, err := r.DB.ExecContext(ctx, "UPDATE users SET username=$2 WHERE id=$1", id, username)
 	if err != nil {
 		return nil, err
 	}
-	return &model.User{ID: id, Name: username, Password: password}, nil
+	return &model.User{ID: id, Name: username}, nil
+}
+
+func (r *mutationResolver) UpdateUserPassword(ctx context.Context, id string, password string) (*model.User, error) {
+	_, err := r.DB.ExecContext(ctx, "UPDATE users SET password=$2 WHERE id=$1", id, password)
+	if err != nil {
+		return nil, err
+	}
+	return &model.User{ID: id, Password: password}, nil
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.User, error) {
