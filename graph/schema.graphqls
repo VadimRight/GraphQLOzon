@@ -1,4 +1,4 @@
-# Определение типа User с его полями и связями
+# graph/schema.graphqls
 type User {
   id: ID!
   username: String!
@@ -7,7 +7,6 @@ type User {
   comments: [Comment!]!
 }
 
-# Определение типа Post с его полями и связями
 type Post {
   id: ID!
   text: String!
@@ -15,7 +14,6 @@ type Post {
   author: User!
 }
 
-# Определение типа Comment с его полями и связями
 type Comment {
   id: ID!
   comment: String!
@@ -24,21 +22,18 @@ type Comment {
   author: User!
 }
 
-
-# Корневой тип Query, агрегирующий все запросы
 type Query {
-  createUser(username: String!, password: String!): User!
-  updateUserName(id: ID!, username: String!): User!
-  updateUserPassword(id: ID!, password: String!): User!
-  deleteUser(id: ID!): User!
+  users: [User!]!
+  user(id: ID!): User
+  posts: [Post!]!
+  post(id: ID!): Post
+  comments: [Comment!]!
+  comment(id: ID!): Comment
 }
 
-# Корневой тип Mutation, агрегирующий все мутации
 type Mutation {
-  # Упрощенные мутации для удобного доступа (опционально)
   createUser(username: String!, password: String!): User!
-  updateUserName(id: ID!, username: String!): User!
-  updateUserPassword(id: ID!, password: String!): User!
+  updateUser(id: ID!, username: String!, password: String!): User!
   deleteUser(id: ID!): User!
 
   createPost(text: String!, authorId: ID!): Post!
@@ -49,4 +44,3 @@ type Mutation {
   updateComment(id: ID!, comment: String!): Comment!
   deleteComment(id: ID!): Comment!
 }
-
