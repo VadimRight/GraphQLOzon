@@ -7,10 +7,14 @@ import (
 	"github.com/VadimRight/GraphQLOzon/graph/model"
 	"database/sql"
 	"github.com/google/uuid"
+	"github.com/VadimRight/GraphQLOzon/internal/service"
+	"github.com/lib/pq"
 )
 
 type Resolver struct{
+	UserService service.UserService
 	DB *sql.DB
+
 }
 
 func (r *Resolver) Query() QueryResolver {
@@ -63,12 +67,14 @@ func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*m
 }
 
 func (r *mutationResolver) LoginUser(ctx context.Context, username string, password string) (*model.User, error) {
-	getUser, err := UserByUsername(ctx, username)
+	getUser, err := r.UserService.GetUserByUsername(ctx, username)
 	if err != nil {
 		if postgresErr, ok := err.(*pq.Error); ok {
     			return nil, postgresErr
 		}				
+		return nil, err
 	}
+	return getUser, nil
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, username string, password string) (*model.User, error) {
