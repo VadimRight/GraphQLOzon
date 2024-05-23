@@ -4,7 +4,6 @@ package graph
 import (
 	"context"
 	"database/sql"
-	"log"
 	"errors"
 	"github.com/VadimRight/GraphQLOzon/graph/model"
 	"github.com/VadimRight/GraphQLOzon/internal/service"
