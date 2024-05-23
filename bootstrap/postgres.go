@@ -67,3 +67,8 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 func CloseDB(db *Storage) error {
 	return db.DB.Close()
 }
+
+func GetDB() *Storage {
+	var db *Storage
+	return db
+}
