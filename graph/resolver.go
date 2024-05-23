@@ -81,3 +81,33 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.Us
 	}
 	return &user, nil
 }
+
+func (r *mutationResolver) CreatePost(ctx context.Context, text string, authorId string) (*model.Post, error) {
+	id := uuid.New().String()
+	_, err := r.DB.ExecContext(ctx, "INSERT INTO post (id, text, author_id) VALUES ($1, $2, $3)", id, text, authorId)
+	if err != nil {
+		return nil, err
+	}
+	return &model.Post{ID: id, Text: text, AuthorID: authorId}, nil
+}
+
+func (r *mutationResolver) UpdatePost(ctx context.Context, id string, text string) (*model.Post, error) {
+	_, err := r.DB.ExecContext(ctx, "UPDATE post SET text=$2 WHERE id=$1", id, text)
+	if err != nil {
+		return nil, err
+	}
+	return &model.Post{ID: id, Text: text}, nil
+}
+
+func (r *mutationResolver) DeletePost(ctx context.Context, id string) (*model.Post, error) {
+	var post model.Post
+	err := r.DB.QueryRowContext(ctx, "SELECT id, text, author_id FROM post WHERE id=$1", id).Scan(&post.ID, &post.Text, &post.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+	_, err = r.DB.ExecContext(ctx, "DELETE FROM post WHERE id=$1", id)
+	if err != nil {
+		return nil, err
+	}
+	return &post, nil
+}

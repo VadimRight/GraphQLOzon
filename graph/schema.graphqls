@@ -5,13 +5,28 @@ type User {
   password: String!
 }
 
-type Query {
+type Post {
+  id: ID!
+  text: String!
+  authorId: ID!
+  author: User!
+}
+
+type UserQuery {
   users: [User!]!
   user(id: ID!): User
+}
+
+type PostQuery {
+  posts: [Post!]!
+  post(id: ID!): Post
 }
 
 type Mutation {
   createUser(username: String!, password: String!): User!
   updateUser(id: ID!, username: String, password: String): User!
   deleteUser(id: ID!): User!
+  createPost(text: String!, authorId: ID!): Post!
+  updatePost(id: ID!, text: String!): Post!
+  deletePost(id: ID!): Post!
 }
