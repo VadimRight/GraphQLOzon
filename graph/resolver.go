@@ -213,8 +213,22 @@ func (r *mutationResolver) CreatePost(ctx context.Context, text string, permissi
 	return &model.Post{ID: id, Text: text, AuthorID: user.ID}, nil
 }
 
-func (r *queryResolver) Comments(ctx context.Context) ([]*model.CommentResponse, error) {
-	rows, err := r.DB.QueryContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment")
+func (r *queryResolver) Comments(ctx context.Context, limit *int, offset *int) ([]*model.CommentResponse, error) {
+	query := "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment"
+	params := []interface{}{}
+
+	if limit != nil && offset != nil {
+		query += " LIMIT $1 OFFSET $2"
+		params = append(params, *limit, *offset)
+	} else if limit != nil {
+		query += " LIMIT $1"
+		params = append(params, *limit)
+	} else if offset != nil {
+		query += " OFFSET $1"
+		params = append(params, *offset)
+	}
+
+	rows, err := r.DB.QueryContext(ctx, query, params...)
 	if err != nil {
 		return nil, err
 	}
