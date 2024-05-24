@@ -188,7 +188,7 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 func (r *mutationResolver) CreatePost(ctx context.Context, text string) (*model.Post, error) {
 	user := middleware.CtxValue(ctx)
 	if user == nil {
-		return nil, errors.New("unauthorized")
+		return nil, errors.New("create post not auth")
 	}
 
 	id := uuid.New().String()
