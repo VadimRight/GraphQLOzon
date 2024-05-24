@@ -23,14 +23,14 @@ type Post struct {
 type Query struct {
 }
 
+type Token struct {
+	Token string `json:"token"`
+}
+
 type User struct {
 	ID       string     `json:"id"`
 	Username string     `json:"username"`
 	Password string     `json:"password"`
 	Posts    []*Post    `json:"posts"`
 	Comments []*Comment `json:"comments"`
-}
-
-type Token struct {
-	Token string 	`json:"token"`
 }

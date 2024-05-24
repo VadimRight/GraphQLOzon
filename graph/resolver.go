@@ -56,7 +56,6 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 	if authUser == nil {
 		return nil, errors.New("unauthorized")
 	}
-
 	var user model.User
 	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username, &user.Password)
 	if err != nil {
