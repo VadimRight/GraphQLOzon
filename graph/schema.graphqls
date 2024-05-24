@@ -23,6 +23,16 @@ type Comment {
   author: User!
 }
 
+
+type CommentResponce {
+  id: ID!
+  comment: String!
+  authorId: ID!
+  postId: ID!
+  parrentCommentID: ID!
+  author: User!
+}
+
 type Query {
   userByUsername(username: String!): User!
   users: [User!]!
