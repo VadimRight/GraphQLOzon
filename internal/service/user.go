@@ -13,6 +13,11 @@ type UserService interface {
 	UserCreate(ctx context.Context, username string, password string) (*model.User, error)
 	HashPassword(password string) string
 	ComparePassword(hashed string, normal string) error
+	GetPostsByUserID(ctx context.Context, userID string) ([]*model.Post, error)
+	GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error)
+	GetCommentsByParentID(ctx context.Context, parentID string) ([]*model.CommentResponse, error)
+	GetCommentsByUserID(ctx context.Context, userID string) ([]*model.Comment, error)
+	GetUserByID(ctx context.Context, userID string) (*model.User, error)
 }
 
 type userService struct {
@@ -47,7 +52,8 @@ func (s *userService) UserCreate(ctx context.Context, username string, password 
 	}
 	return &model.User{ID: id, Username: username, Password: password}, nil
 }
-func (s *userService) getUserByID(ctx context.Context, userID string) (*model.User, error) {
+
+func (s *userService) GetUserByID(ctx context.Context, userID string) (*model.User, error) {
 	var user model.User
 	err := s.storage.DB.QueryRowContext(ctx, "SELECT id, username FROM users WHERE id=$1", userID).Scan(&user.ID, &user.Username)
 	if err != nil {

@@ -13,6 +13,7 @@ type Post {
   text: String!
   authorId: ID!
   author: User!
+  comments: [CommentResponse!]!
 }
 
 type Comment {
@@ -31,6 +32,7 @@ type CommentResponse {
   postId: ID!
   parentCommentID: ID
   author: User!
+  replies: [CommentResponse!]!
 }
 
 type Query {

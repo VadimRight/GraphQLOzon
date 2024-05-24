@@ -45,12 +45,12 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 			return nil, err
 		}
 
-		user.Posts, err = r.getPostsByUserID(ctx, user.ID)
+		user.Posts, err = r.UserService.GetPostsByUserID(ctx, user.ID)
 		if err != nil {
 			return nil, err
 		}
 
-		user.Comments, err = r.getCommentsByUserID(ctx, user.ID)
+		user.Comments, err = r.UserService.GetCommentsByUserID(ctx, user.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -67,12 +67,12 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 		return nil, err
 	}
 
-	user.Posts, err = r.getPostsByUserID(ctx, user.ID)
+	user.Posts, err = r.UserService.GetPostsByUserID(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	user.Comments, err = r.getCommentsByUserID(ctx, user.ID)
+	user.Comments, err = r.UserService.GetCommentsByUserID(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -88,12 +88,12 @@ func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*m
 		return nil, err
 	}
 
-	user.Posts, err = r.getPostsByUserID(ctx, user.ID)
+	user.Posts, err = r.UserService.GetPostsByUserID(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	user.Comments, err = r.getCommentsByUserID(ctx, user.ID)
+	user.Comments, err = r.UserService.GetCommentsByUserID(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -207,12 +207,12 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 			return nil, err
 		}
 
-		post.Author, err = r.getUserByID(ctx, post.AuthorID)
+		post.Author, err = r.UserService.GetUserByID(ctx, post.AuthorID)
 		if err != nil {
 			return nil, err
 		}
 
-		post.Comments, err = r.getCommentsByPostID(ctx, post.ID)
+		post.Comments, err = r.UserService.GetCommentsByPostID(ctx, post.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -229,12 +229,12 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 		return nil, err
 	}
 
-	post.Author, err = r.getUserByID(ctx, post.AuthorID)
+	post.Author, err = r.UserService.GetUserByID(ctx, post.AuthorID)
 	if err != nil {
 		return nil, err
 	}
 
-	post.Comments, err = r.getCommentsByPostID(ctx, post.ID)
+	post.Comments, err = r.UserService.GetCommentsByPostID(ctx, post.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -300,12 +300,12 @@ func (r *queryResolver) Comments(ctx context.Context) ([]*model.CommentResponse,
 			return nil, err
 		}
 
-		comment.Author, err = r.getUserByID(ctx, comment.AuthorID)
+		comment.Author, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
 		if err != nil {
 			return nil, err
 		}
 
-		comment.Replies, err = r.getCommentsByParentID(ctx, comment.ID)
+		comment.Replies, err = r.UserService.GetCommentsByParentID(ctx, comment.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -322,12 +322,12 @@ func (r *queryResolver) Comment(ctx context.Context, id string) (*model.CommentR
 		return nil, err
 	}
 
-	comment.Author, err = r.getUserByID(ctx, comment.AuthorID)
+	comment.Author, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
 	if err != nil {
 		return nil, err
 	}
 
-	comment.Replies, err = r.getCommentsByParentID(ctx, comment.ID)
+	comment.Replies, err = r.UserService.GetCommentsByParentID(ctx, comment.ID)
 	if err != nil {
 		return nil, err
 	}
