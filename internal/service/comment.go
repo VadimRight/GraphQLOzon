@@ -9,7 +9,7 @@ import (
 )
 
 type CommentService interface {
-	GetPostById(ctx context.Context, id string) (*model.CommentResponse, error)
+	GetPostIdByItemId(ctx context.Context, id string) (*model.CommentResponse, error)
 }
 
 type commentService struct {
@@ -20,7 +20,7 @@ func NewCommentService(storage bootstrap.Storage) CommentService {
 	return &commentService{storage: storage}
 }
 
-func (s *commentService) GetPostById(ctx context.Context, id string) (*model.CommentResponse, error) {
+func (s *commentService) GetPostIdByItemId(ctx context.Context, id string) (*model.CommentResponse, error) {
 	var comment model.CommentResponse
 	err := s.storage.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE username=$1", id).Scan(&comment.ID, &comment.Comment)
 	if err != nil {

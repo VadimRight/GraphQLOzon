@@ -16,6 +16,7 @@ import (
 
 
 type Resolver struct{
+	CommentService service.CommentService
 	UserService service.UserService
 	DB *sql.DB
 }
@@ -281,17 +282,22 @@ func (r *mutationResolver) CreateComment(ctx context.Context, comment string, it
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
-	var commentAble bool
-	err := r.DB.QueryRowContext(ctx, "SELECT commentable FROM post WHERE id=$1", itemId).Scan(&commentAble)
-	if err != nil {
-		return nil, err
-	} else if commentAble == false {
+	if r.CommentService == nil {
+		return nil, errors.New("comment service is not initialized")
+	}
+	if _, err := r.CommentService.GetPostIdByItemId(ctx, itemId); err == nil {
+		var commentAble bool
+		err := r.DB.QueryRowContext(ctx, "SELECT commentable FROM post WHERE id=$1", itemId).Scan(&commentAble)
+		if err != sql.ErrNoRows {		
+			return nil, err
+		} else if commentAble == false {
 		return nil, errors.New("Author turned off comments under this post")	
+	}
 	}
 	var isReply bool
 	var parentCommentID *string
 	var postID string
-	err = r.DB.QueryRowContext(ctx, "SELECT post_id FROM comment WHERE id=$1", itemId).Scan(&postID)
+	err := r.DB.QueryRowContext(ctx, "SELECT post_id FROM comment WHERE id=$1", itemId).Scan(&postID)
 	if err == sql.ErrNoRows {
 		postID = itemId
 		isReply = false		
