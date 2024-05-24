@@ -151,7 +151,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, username string, pa
 }
 
 func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
-	rows, err := r.DB.QueryContext(ctx, "SELECT id, text, author_id FROM post")
+	rows, err := r.DB.QueryContext(ctx, "SELECT id, text, author_id, commentable FROM post")
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +181,7 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 
 func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
 	var post model.Post
-	err := r.DB.QueryRowContext(ctx, "SELECT id, text, author_id FROM post WHERE id=$1", id).Scan(&post.ID, &post.Text, &post.AuthorID)
+	err := r.DB.QueryRowContext(ctx, "SELECT id, text, author_id, commentable FROM post WHERE id=$1", id).Scan(&post.ID, &post.Text, &post.AuthorID)
 	if err != nil {
 		return nil, err
 	}
