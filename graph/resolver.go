@@ -294,32 +294,39 @@ func (r *mutationResolver) CreateComment(ctx context.Context, comment string, it
 	if r.CommentService == nil {
 		return nil, errors.New("comment service is not initialized")
 	}
+
 	var isReply bool
 	var parentCommentID *string
 	var postID string
-	_, err := r.CommentService.GetPostIdByItemId(ctx, itemId)
-	if  err == nil {
-		var commentAble bool
-		err := r.DB.QueryRowContext(ctx, "SELECT commentable FROM post WHERE id=$1", itemId).Scan(&commentAble)
-		if err != sql.ErrNoRows {		
-			return nil, err
-		} else if commentAble == false {
-			return nil, errors.New("Author turned off comments under this post")	
-		}
-	}
-	err = r.DB.QueryRowContext(ctx, "SELECT post_id FROM comment WHERE id=$1", itemId).Scan(&postID)
+	var commentAble bool
+
+	// Сначала проверяем, является ли itemId постом и включены ли комментарии
+	err := r.DB.QueryRowContext(ctx, "SELECT commentable FROM post WHERE id=$1", itemId).Scan(&commentAble)
 	if err == sql.ErrNoRows {
-		postID = itemId
-		isReply = false		
-	} else if err != nil{
+		// Если itemId не является постом, это может быть комментарием
+		err = r.DB.QueryRowContext(ctx, "SELECT post_id FROM comment WHERE id=$1", itemId).Scan(&postID)
+		if err == sql.ErrNoRows {
+			return nil, errors.New("item not found")
+		} else if err != nil {
+			return nil, err
+		} else {
+			parentCommentID = &itemId
+			isReply = true
+		}
+	} else if err != nil {
 		return nil, err
+	} else if !commentAble {
+		return nil, errors.New("author turned off comments under this post")
 	} else {
-		parentCommentID = &itemId
-		isReply = true
+		// itemId является постом и комментарии включены
+		postID = itemId
+		isReply = false
 	}
+
 	id := uuid.New().String()
 	var query string
 	if isReply {
+		// Если это ответ на комментарий
 		query = "INSERT INTO comment (id, comment, author_id, post_id, parent_comment_id) VALUES ($1, $2, $3, $4, $5)"
 		_, err := r.DB.ExecContext(ctx, query, id, comment, user.ID, postID, itemId)
 		if err != nil {
@@ -327,12 +334,12 @@ func (r *mutationResolver) CreateComment(ctx context.Context, comment string, it
 		}
 		return &model.CommentResponse{ID: id, Comment: comment, AuthorID: user.ID, PostID: postID, ParentCommentID: parentCommentID}, nil
 	} else {
+		// Если это комментарий к посту
 		query = "INSERT INTO comment (id, comment, author_id, post_id, parent_comment_id) VALUES ($1, $2, $3, $4, NULL)"
-		_, err := r.DB.ExecContext(ctx, query, id, comment, user.ID, itemId)
+		_, err := r.DB.ExecContext(ctx, query, id, comment, user.ID, postID)
 		if err != nil {
 			return nil, err
 		}
 		return &model.CommentResponse{ID: id, Comment: comment, AuthorID: user.ID, PostID: postID}, nil
 	}
 }
-
