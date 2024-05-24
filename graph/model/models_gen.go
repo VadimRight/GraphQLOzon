@@ -2,28 +2,26 @@
 
 package model
 
-// Данные модели служат для валидации данных при обращении клиента к GraphQL серверу
-
-// Модель комментария
 type Comment struct {
-	ID              string  `json:"id"`
-	Comment         string  `json:"comment"`
-	AuthorID        string  `json:"authorId"`
-	ItemID          string  `json:"itemId"`
+	ID       string `json:"id"`
+	Comment  string `json:"comment"`
+	AuthorID string `json:"authorId"`
+	ItemID   string `json:"itemId"`
+	Author   *User  `json:"author"`
 }
 
 type CommentResponse struct {
 	ID              string  `json:"id"`
 	Comment         string  `json:"comment"`
 	AuthorID        string  `json:"authorId"`
-	PostID          string `json:"postId"`
-	ParentCommentID *string `json:"parentCommentId"`
+	PostID          string  `json:"postId"`
+	ParentCommentID *string `json:"parentCommentID,omitempty"`
+	Author          *User   `json:"author"`
 }
 
 type Mutation struct {
 }
 
-// Модель поста
 type Post struct {
 	ID       string `json:"id"`
 	Text     string `json:"text"`
@@ -34,12 +32,10 @@ type Post struct {
 type Query struct {
 }
 
-// Модель токена
 type Token struct {
 	Token string `json:"token"`
 }
 
-// Модель пользователя
 type User struct {
 	ID       string     `json:"id"`
 	Username string     `json:"username"`
