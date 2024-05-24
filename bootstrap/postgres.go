@@ -63,11 +63,11 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 		comment VARCHAR(2000),
 		author_id UUID NOT NULL,
 		post_id UUID NOT NULL,
-		parrent_comment_id UUID,
+		parent_comment_id UUID,
     		created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (author_id) REFERENCES users(id),
 		FOREIGN KEY (post_id) REFERENCES post(id),
-		FOREIGN KEY (parrent_comment_id) REFERENCES comment(id)
+		FOREIGN KEY (parent_comment_id) REFERENCES comment(id)
 	);`)
 	if err != nil {	log.Fatalf("%s: %v", op, err) }
 	_, err = createCommentTable.Exec()

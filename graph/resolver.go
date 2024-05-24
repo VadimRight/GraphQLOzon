@@ -240,7 +240,7 @@ func (r *mutationResolver) DeletePost(ctx context.Context, id string) (*model.Po
 }
 
 func (r *queryResolver) Comments(ctx context.Context) ([]*model.CommentResponse, error) {
-	rows, err := r.DB.QueryContext(ctx, "SELECT id, comment, author_id, item_id FROM comment")
+	rows, err := r.DB.QueryContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment")
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +249,7 @@ func (r *queryResolver) Comments(ctx context.Context) ([]*model.CommentResponse,
 	var comments []*model.CommentResponse
 	for rows.Next() {
 		var comment model.CommentResponse
-		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID); err != nil {
+		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID); err != nil {
 			return nil, err
 		}
 		comments = append(comments, &comment)
@@ -259,7 +259,7 @@ func (r *queryResolver) Comments(ctx context.Context) ([]*model.CommentResponse,
 
 func (r *queryResolver) Comment(ctx context.Context, id string) (*model.CommentResponse, error) {
 	var comment model.CommentResponse
-	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, item_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
+	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
 	if err != nil {
 		return nil, err
 	}
@@ -287,14 +287,14 @@ func (r *mutationResolver) CreateComment(ctx context.Context, comment string, it
 	id := uuid.New().String()
 	var query string
 	if isReply {
-		query = "INSERT INTO comment (id, comment, author_id, post_id, parrent_comment_id) VALUES ($1, $2, $3, $4, $5)"
+		query = "INSERT INTO comment (id, comment, author_id, post_id, parent_comment_id) VALUES ($1, $2, $3, $4, $5)"
 		_, err := r.DB.ExecContext(ctx, query, id, comment, user.ID, postID, itemId)
 		if err != nil {
 			return nil, err
 		}
 		return &model.CommentResponse{ID: id, Comment: comment, AuthorID: user.ID, PostID: postID, ParentCommentID: parentCommentID}, nil
 	} else {
-		query = "INSERT INTO comment (id, comment, author_id, post_id, parrent_comment_id) VALUES ($1, $2, $3, $4, NULL)"
+		query = "INSERT INTO comment (id, comment, author_id, post_id, parent_comment_id) VALUES ($1, $2, $3, $4, NULL)"
 		_, err := r.DB.ExecContext(ctx, query, id, comment, user.ID, itemId)
 		if err != nil {
 			return nil, err
