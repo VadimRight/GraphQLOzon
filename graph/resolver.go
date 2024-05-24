@@ -5,9 +5,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/VadimRight/GraphQLOzon/graph/model"
-	"github.com/VadimRight/GraphQLOzon/internal/service"
 	"github.com/VadimRight/GraphQLOzon/internal/middleware"
+	"github.com/VadimRight/GraphQLOzon/internal/service"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
@@ -190,9 +191,9 @@ func (r *mutationResolver) CreatePost(ctx context.Context, text string) (*model.
 	if user == nil {
 		return nil, errors.New("create post not auth")
 	}
-
+	fmt.Println(user.ID)
 	id := uuid.New().String()
-	_, err := r.DB.ExecContext(ctx, "INSERT INTO post (id, text, author_id) VALUES ($1, $2, $3)", id, text, user.Id)
+	_, err := r.DB.ExecContext(ctx, "INSERT INTO post (id, text, author_id) VALUES ($1, $2, $3)", id, text, user.ID)
 	if err != nil {
 		return nil, err
 	}
