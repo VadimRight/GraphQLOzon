@@ -30,6 +30,7 @@ func (r *Resolver) Mutation() MutationResolver {
 type queryResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 
+// Функция получения всех пользователей
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	rows, err := r.DB.QueryContext(ctx, "SELECT id, username FROM users")
 	if err != nil {
@@ -48,6 +49,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	return users, nil
 }
 
+// Функция получения пользователя по ID
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
 	var user model.User
 	err := r.DB.QueryRowContext(ctx, "SELECT id, username FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username, &user.Password)
@@ -57,6 +59,7 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 	return &user, nil
 }
 
+// Функция получения пользователя по его имени
 func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*model.User, error) {
 	var user model.User
 	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE username=$1", username).Scan(&user.ID, &user.Username, &user.Password)
@@ -66,6 +69,7 @@ func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*m
 	return &user, nil
 }
 
+// Функция логина пользователя
 func (r *mutationResolver) LoginUser(ctx context.Context, username string, password string) (*model.Token, error) {
 	getUser, err := r.UserService.GetUserByUsername(ctx, username)
 	if err != nil {
@@ -84,25 +88,26 @@ func (r *mutationResolver) LoginUser(ctx context.Context, username string, passw
 	return &model.Token{Token: token}, nil
 }
 
+// Функция регистрации пользователя
 func (r *mutationResolver) RegisterUser(ctx context.Context, username string, password string) (*model.User, error) {
-	// Check if UserService is initialized
+	// Проверка инициализирован ли интерфейс UserService
 	if r.UserService == nil {
 		return nil, errors.New("user service is not initialized")
 	}
 
-	// Check if user already exists
+	// Проверка существует ли пользователь уже в базе данных
 	_, err := r.UserService.GetUserByUsername(ctx, username)
 	if err == nil {
 		return nil, errors.New("user already exists")
 	}
 	password = r.UserService.HashPassword(password)
-	// Create the user if they don't exist
+	// Вызов инфраструктурной функции создания пользователя, которая прикреплена к интерфейсу сервиса пользователей
 	createdUser, err := r.UserService.UserCreate(ctx, username, password)
 	if err != nil {
 		return nil, err
 	}
 
-	// Check if createdUser is nil
+	// Проверка успешности создания пользователя
 	if createdUser == nil {
 		return nil, errors.New("failed to create user")
 	}
@@ -115,6 +120,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, username string, pa
 	return &user, nil
 }
 
+// Функция редактирования имени полльзователя (защищено токеном)
 func (r *mutationResolver) UpdateUserUsername(ctx context.Context, id string, username string) (*model.User, error) {
 	user := middleware.CtxValue(ctx)
 	if user == nil {
@@ -128,6 +134,7 @@ func (r *mutationResolver) UpdateUserUsername(ctx context.Context, id string, us
 	return &model.User{ID: id, Username: username}, nil
 }
 
+// Функция редактирования пароля (защищено токеном)
 func (r *mutationResolver) UpdateUserPassword(ctx context.Context, id string, password string) (*model.User, error) {
 	user := middleware.CtxValue(ctx)
 	if user == nil {
@@ -141,6 +148,7 @@ func (r *mutationResolver) UpdateUserPassword(ctx context.Context, id string, pa
 	return &model.User{ID: id, Password: password}, nil
 }
 
+// Функция удаления собственной учетной записи (защищено токеном)
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.User, error) {
 	authUser := middleware.CtxValue(ctx)
 	if authUser == nil {

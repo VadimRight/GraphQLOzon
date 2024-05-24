@@ -12,6 +12,11 @@ type Storage struct {
 	DB *sql.DB
 }
 
+
+// Все SQL запросы и функции работы с базой данных храняться в файле graph/resolver.go
+
+
+
 // Функция инициализации базы данных и подключение к базе данных
 func InitPostgresDatabase(cfg *Config) *Storage  {
 	const op = "postgres.InitPostgresDatabase"
@@ -70,9 +75,4 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 // Функция закрытия соединения с базой данных
 func CloseDB(db *Storage) error {
 	return db.DB.Close()
-}
-
-func GetDB() *Storage {
-	var db *Storage
-	return db
 }

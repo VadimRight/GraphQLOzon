@@ -2,6 +2,9 @@
 
 package model
 
+// Данные модели служат для валидации данных при обращении клиента к GraphQL серверу
+
+// Модель комментария
 type Comment struct {
 	ID       string `json:"id"`
 	Comment  string `json:"comment"`
@@ -13,6 +16,7 @@ type Comment struct {
 type Mutation struct {
 }
 
+// Модель поста
 type Post struct {
 	ID       string `json:"id"`
 	Text     string `json:"text"`
@@ -23,10 +27,12 @@ type Post struct {
 type Query struct {
 }
 
+// Модель токена
 type Token struct {
 	Token string `json:"token"`
 }
 
+// Модель пользователя
 type User struct {
 	ID       string     `json:"id"`
 	Username string     `json:"username"`
