@@ -160,7 +160,7 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 	var posts []*model.Post
 	for rows.Next() {
 		var post model.Post
-		if err := rows.Scan(&post.ID, &post.Text, &post.AuthorID); err != nil {
+		if err := rows.Scan(&post.ID, &post.Text, &post.AuthorID, &post.Commentable); err != nil {
 			return nil, err
 		}
 
@@ -181,7 +181,7 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 
 func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
 	var post model.Post
-	err := r.DB.QueryRowContext(ctx, "SELECT id, text, author_id, commentable FROM post WHERE id=$1", id).Scan(&post.ID, &post.Text, &post.AuthorID)
+	err := r.DB.QueryRowContext(ctx, "SELECT id, text, author_id, commentable FROM post WHERE id=$1", id).Scan(&post.ID, &post.Text, &post.AuthorID, &post.Commentable)
 	if err != nil {
 		return nil, err
 	}
