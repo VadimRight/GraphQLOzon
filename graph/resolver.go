@@ -185,18 +185,18 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 	return &post, nil
 }
 
-func (r *mutationResolver) CreatePost(ctx context.Context, text string, authorId string) (*model.Post, error) {
+func (r *mutationResolver) CreatePost(ctx context.Context, text string) (*model.Post, error) {
 	user := middleware.CtxValue(ctx)
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
 
 	id := uuid.New().String()
-	_, err := r.DB.ExecContext(ctx, "INSERT INTO post (id, text, author_id) VALUES ($1, $2, $3)", id, text, authorId)
+	_, err := r.DB.ExecContext(ctx, "INSERT INTO post (id, text, author_id) VALUES ($1, $2, $3)", id, text, user.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &model.Post{ID: id, Text: text, AuthorID: authorId}, nil
+	return &model.Post{ID: id, Text: text, AuthorID: user.Id}, nil
 }
 
 func (r *mutationResolver) UpdatePost(ctx context.Context, id string, text string) (*model.Post, error) {

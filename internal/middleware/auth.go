@@ -47,3 +47,4 @@ func CtxValue(ctx context.Context) *service.JwtCustomClaim {
 	raw, _ := ctx.Value(authString("auth")).(*service.JwtCustomClaim)
 	return raw
 }
+

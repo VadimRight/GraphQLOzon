@@ -36,6 +36,7 @@ type ServerConfig struct {
 	Timeout           time.Duration 
 	IdleTimeout       time.Duration
 	RunMode string
+	JWTSecret string
 }
 
 //  Функция загрузки конфигурации пути к файлу .env и типу .env (локальный или докер)
@@ -132,6 +133,9 @@ func loadServerConfig() *ServerConfig {
 	serverRunMode, ok := os.LookupEnv("SERVER_RUN_MODE")
 	if !ok{	log.Fatalf("err while parsing run mode")}
 	
+	jwtSecret, ok := os.LookupEnv("JWT_SECRET")
+	if !ok {log.Fatal("Can't read SERVER_ADDR")}
+
 	timeout, ok := os.LookupEnv("TIMEOUT")
 	if !ok {log.Fatal("Can't read TIMEOUT")}
 	
@@ -147,6 +151,7 @@ func loadServerConfig() *ServerConfig {
 		ServerAddress: serverAddr, 
 		ServerPort: serverPort,
 		RunMode: serverRunMode,
+		JWTSecret: jwtSecret,
 		Timeout: timeoutTime, 
 		IdleTimeout: idleTimeoutTime, 	
 	}

@@ -57,7 +57,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateComment      func(childComplexity int, comment string, authorID string, itemID string) int
-		CreatePost         func(childComplexity int, text string, authorID string) int
+		CreatePost         func(childComplexity int, text string) int
 		DeleteComment      func(childComplexity int, id string) int
 		DeletePost         func(childComplexity int, id string) int
 		DeleteUser         func(childComplexity int, id string) int
@@ -105,7 +105,7 @@ type MutationResolver interface {
 	UpdateUserPassword(ctx context.Context, id string, password string) (*model.User, error)
 	UpdateUserUsername(ctx context.Context, id string, username string) (*model.User, error)
 	DeleteUser(ctx context.Context, id string) (*model.User, error)
-	CreatePost(ctx context.Context, text string, authorID string) (*model.Post, error)
+	CreatePost(ctx context.Context, text string) (*model.Post, error)
 	UpdatePost(ctx context.Context, id string, text string) (*model.Post, error)
 	DeletePost(ctx context.Context, id string) (*model.Post, error)
 	CreateComment(ctx context.Context, comment string, authorID string, itemID string) (*model.Comment, error)
@@ -198,7 +198,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreatePost(childComplexity, args["text"].(string), args["authorId"].(string)), true
+		return e.complexity.Mutation.CreatePost(childComplexity, args["text"].(string)), true
 
 	case "Mutation.deleteComment":
 		if e.complexity.Mutation.DeleteComment == nil {
@@ -615,15 +615,6 @@ func (ec *executionContext) field_Mutation_createPost_args(ctx context.Context, 
 		}
 	}
 	args["text"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["authorId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorId"))
-		arg1, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authorId"] = arg1
 	return args, nil
 }
 
@@ -1502,7 +1493,7 @@ func (ec *executionContext) _Mutation_createPost(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreatePost(rctx, fc.Args["text"].(string), fc.Args["authorId"].(string))
+		return ec.resolvers.Mutation().CreatePost(rctx, fc.Args["text"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

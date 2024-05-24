@@ -43,7 +43,7 @@ type Mutation {
   updateUserUsername(id: ID!, username: String!): User!
   deleteUser(id: ID!): User!
 
-  createPost(text: String!, authorId: ID!): Post!
+  createPost(text: String!): Post!
   updatePost(id: ID!, text: String!): Post!
   deletePost(id: ID!): Post!
 
