@@ -74,7 +74,7 @@ func (s *userService) GetUserByID(ctx context.Context, userID string) (*model.Us
 }
 
 func (s *userService) GetPostsByUserID(ctx context.Context, userID string) ([]*model.Post, error) {
-	rows, err := s.storage.DB.QueryContext(ctx, "SELECT id, text, author_id FROM post WHERE author_id=$1", userID)
+	rows, err := s.storage.DB.QueryContext(ctx, "SELECT id, text, author_id, commentable FROM post WHERE author_id=$1", userID)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (s *userService) GetPostsByUserID(ctx context.Context, userID string) ([]*m
 	var posts []*model.Post
 	for rows.Next() {
 		var post model.Post
-		if err := rows.Scan(&post.ID, &post.Text, &post.AuthorID); err != nil {
+		if err := rows.Scan(&post.ID, &post.Text, &post.AuthorID, &post.Commentable); err != nil {
 			return nil, err
 		}
 
