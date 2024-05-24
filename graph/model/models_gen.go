@@ -6,12 +6,18 @@ package model
 
 // Модель комментария
 type Comment struct {
-	ID       string `json:"id"`
-	Comment  string `json:"comment"`
-	AuthorID string `json:"authorId"`
-	PostID   string `json:"postId"`
-	ParrentCommentID   *string `json:"parrentCommentId"`
-	Author   *User  `json:"author"`
+	ID              string  `json:"id"`
+	Comment         string  `json:"comment"`
+	AuthorID        string  `json:"authorId"`
+	ItemID          string  `json:"itemId"`
+}
+
+type CommentResponse struct {
+	ID              string  `json:"id"`
+	Comment         string  `json:"comment"`
+	AuthorID        string  `json:"authorId"`
+	PostID          string `json:"postId"`
+	ParentCommentID *string `json:"parentCommentId"`
 }
 
 type Mutation struct {

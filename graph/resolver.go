@@ -239,16 +239,16 @@ func (r *mutationResolver) DeletePost(ctx context.Context, id string) (*model.Po
 	return &post, nil
 }
 
-func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) {
+func (r *queryResolver) Comments(ctx context.Context) ([]*model.CommentResponse, error) {
 	rows, err := r.DB.QueryContext(ctx, "SELECT id, comment, author_id, item_id FROM comment")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var comments []*model.Comment
+	var comments []*model.CommentResponse
 	for rows.Next() {
-		var comment model.Comment
+		var comment model.CommentResponse
 		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID); err != nil {
 			return nil, err
 		}
@@ -257,16 +257,16 @@ func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) 
 	return comments, nil
 }
 
-func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
-	var comment model.Comment
-	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, item_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParrentCommentID)
+func (r *queryResolver) Comment(ctx context.Context, id string) (*model.CommentResponse, error) {
+	var comment model.CommentResponse
+	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, item_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
 	if err != nil {
 		return nil, err
 	}
 	return &comment, nil
 }
 
-func (r *mutationResolver) CreateComment(ctx context.Context, commentText string, itemId string) (*model.Comment, error) {
+func (r *mutationResolver) CreateComment(ctx context.Context, commentText string, itemId string) (*model.CommentResponse, error) {
 	user := middleware.CtxValue(ctx)
 	if user == nil {
 		return nil, errors.New("unauthorized")
@@ -293,14 +293,14 @@ func (r *mutationResolver) CreateComment(ctx context.Context, commentText string
 		if err != nil {
 			return nil, err
 		}
-		return &model.Comment{ID: id, Comment: commentText, AuthorID: user.ID, PostID: postID, ParrentCommentID: parentCommentID}, nil
+		return &model.CommentResponse{ID: id, Comment: commentText, AuthorID: user.ID, PostID: postID, ParentCommentID: parentCommentID}, nil
 	} else {
 		query = "INSERT INTO comment (id, comment, author_id, post_id, parrent_comment_id) VALUES ($1, $2, $3, $4, NULL)"
 		_, err := r.DB.ExecContext(ctx, query, id, comment, user.ID, itemId)
 		if err != nil {
 			return nil, err
 		}
-		return &model.Comment{ID: id, Comment: commentText, AuthorID: user.ID, PostID: itemId}, nil
+		return &model.CommentResponse{ID: id, Comment: commentText, AuthorID: user.ID, PostID: postID}, nil
 	}
 }
 
@@ -317,20 +317,3 @@ func (r *mutationResolver) UpdateComment(ctx context.Context, id string, comment
 	return &model.Comment{ID: id, Comment: comment}, nil
 }
 
-func (r *mutationResolver) DeleteComment(ctx context.Context, id string) (*model.Comment, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
-		return nil, errors.New("unauthorized")
-	}
-
-	var comment model.Comment
-	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, item_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.ItemID)
-	if err != nil {
-		return nil, err
-	}
-	_, err = r.DB.ExecContext(ctx, "DELETE FROM comment WHERE id=$1", id)
-	if err != nil {
-		return nil, err
-	}
-	return &comment, nil
-}
