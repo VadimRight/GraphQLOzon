@@ -9,7 +9,8 @@ type Comment struct {
 	ID       string `json:"id"`
 	Comment  string `json:"comment"`
 	AuthorID string `json:"authorId"`
-	ItemID   string `json:"itemId"`
+	PostID   string `json:"postId"`
+	ParrentCommentID   string `json:"parrentCommentId"`
 	Author   *User  `json:"author"`
 }
 
