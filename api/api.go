@@ -8,6 +8,7 @@ import (
 	"github.com/VadimRight/GraphQLOzon/graph"
 	"github.com/VadimRight/GraphQLOzon/bootstrap"
 	"log"
+	"github.com/VadimRight/GraphQLOzon/internal/service"
 	"github.com/VadimRight/GraphQLOzon/internal/middleware"
 )
 
@@ -22,7 +23,8 @@ func InitServer(cfg *bootstrap.Config, storage *bootstrap.Storage) {
 }
 
 func graphqlHandler(storage *bootstrap.Storage) gin.HandlerFunc {
-	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{DB: storage.DB}}))
+	userService := service.NewUserService(*storage)
+	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{UserService: userService, DB: storage.DB}}))
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}

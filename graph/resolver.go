@@ -12,6 +12,7 @@ import (
 	"github.com/lib/pq"
 )
 
+
 type Resolver struct{
 	UserService service.UserService
 	DB *sql.DB
@@ -29,11 +30,6 @@ type queryResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
-		return nil, errors.New("unauthorized")
-	}
-
 	rows, err := r.DB.QueryContext(ctx, "SELECT id, username, password FROM users")
 	if err != nil {
 		return nil, err
@@ -52,10 +48,6 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 }
 
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
-	authUser := middleware.CtxValue(ctx)
-	if authUser == nil {
-		return nil, errors.New("unauthorized")
-	}
 	var user model.User
 	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username, &user.Password)
 	if err != nil {
@@ -92,12 +84,34 @@ func (r *mutationResolver) LoginUser(ctx context.Context, username string, passw
 }
 
 func (r *mutationResolver) RegisterUser(ctx context.Context, username string, password string) (*model.User, error) {
+	// Check if UserService is initialized
+	if r.UserService == nil {
+		return nil, errors.New("user service is not initialized")
+	}
+
+	// Check if user already exists
 	_, err := r.UserService.GetUserByUsername(ctx, username)
 	if err == nil {
 		return nil, errors.New("user already exists")
 	}
+
+	// Create the user if they don't exist
 	createdUser, err := r.UserService.UserCreate(ctx, username, password)
-	return &model.User{ID: createdUser.ID, Username: username, Password: password}, nil
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if createdUser is nil
+	if createdUser == nil {
+		return nil, errors.New("failed to create user")
+	}
+
+	user := model.User{
+		ID:       createdUser.ID,
+		Username: username,
+		Password: password,
+	}
+	return &user, nil
 }
 
 func (r *mutationResolver) UpdateUserUsername(ctx context.Context, id string, username string) (*model.User, error) {
@@ -145,11 +159,6 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.Us
 }
 
 func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
-		return nil, errors.New("unauthorized")
-	}
-
 	rows, err := r.DB.QueryContext(ctx, "SELECT id, text, author_id FROM post")
 	if err != nil {
 		return nil, err
@@ -168,11 +177,6 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 }
 
 func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
-		return nil, errors.New("unauthorized")
-	}
-
 	var post model.Post
 	err := r.DB.QueryRowContext(ctx, "SELECT id, text, author_id FROM post WHERE id=$1", id).Scan(&post.ID, &post.Text, &post.AuthorID)
 	if err != nil {
@@ -227,11 +231,6 @@ func (r *mutationResolver) DeletePost(ctx context.Context, id string) (*model.Po
 }
 
 func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
-		return nil, errors.New("unauthorized")
-	}
-
 	rows, err := r.DB.QueryContext(ctx, "SELECT id, comment, author_id, item_id FROM comment")
 	if err != nil {
 		return nil, err
@@ -250,11 +249,6 @@ func (r *queryResolver) Comments(ctx context.Context) ([]*model.Comment, error) 
 }
 
 func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
-		return nil, errors.New("unauthorized")
-	}
-
 	var comment model.Comment
 	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, item_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.ItemID)
 	if err != nil {
