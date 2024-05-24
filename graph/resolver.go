@@ -31,7 +31,7 @@ type queryResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	rows, err := r.DB.QueryContext(ctx, "SELECT id, username, password FROM users")
+	rows, err := r.DB.QueryContext(ctx, "SELECT id, username FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	var users []*model.User
 	for rows.Next() {
 		var user model.User
-		if err := rows.Scan(&user.ID, &user.Username, &user.Password); err != nil {
+		if err := rows.Scan(&user.ID, &user.Username); err != nil {
 			return nil, err
 		}
 		users = append(users, &user)
@@ -50,7 +50,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
 	var user model.User
-	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username, &user.Password)
+	err := r.DB.QueryRowContext(ctx, "SELECT id, username FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username, &user.Password)
 	if err != nil {
 		return nil, err
 	}
