@@ -74,7 +74,7 @@ func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*m
 	return &user, nil
 }
 
-func (r *mutationResolver) LoginUser(ctx context.Context, username string, password string) (interface{}, error) {
+func (r *mutationResolver) LoginUser(ctx context.Context, username string, password string) (*model.Token, error) {
 	getUser, err := r.UserService.GetUserByUsername(ctx, username)
 	if err != nil {
 		if postgresErr, ok := err.(*pq.Error); ok {
@@ -89,9 +89,7 @@ func (r *mutationResolver) LoginUser(ctx context.Context, username string, passw
 	if err != nil {
 		return nil, err
 	}
-	return map[string]interface{}{
-		"token": token,
-	}, nil
+	return &model.Token{Token: token}, nil
 }
 
 func (r *mutationResolver) RegisterUser(ctx context.Context, username string, password string) (*model.User, error) {

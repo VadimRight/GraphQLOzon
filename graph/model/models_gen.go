@@ -30,3 +30,7 @@ type User struct {
 	Posts    []*Post    `json:"posts"`
 	Comments []*Comment `json:"comments"`
 }
+
+type Token struct {
+	Token string 	`json:"token"`
+}
