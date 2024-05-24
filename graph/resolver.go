@@ -266,13 +266,12 @@ func (r *queryResolver) Comment(ctx context.Context, id string) (*model.CommentR
 	return &comment, nil
 }
 
-func (r *mutationResolver) CreateComment(ctx context.Context, commentText string, itemId string) (*model.CommentResponse, error) {
+func (r *mutationResolver) CreateComment(ctx context.Context, comment string, itemId string) (*model.CommentResponse, error) {
 	user := middleware.CtxValue(ctx)
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
 	var isReply bool
-	var comment model.Comment
 	var parentCommentID *string
 	var postID string
 	err := r.DB.QueryRowContext(ctx, "SELECT post_id FROM comment WHERE id=$1", itemId).Scan(&postID)
@@ -293,14 +292,14 @@ func (r *mutationResolver) CreateComment(ctx context.Context, commentText string
 		if err != nil {
 			return nil, err
 		}
-		return &model.CommentResponse{ID: id, Comment: commentText, AuthorID: user.ID, PostID: postID, ParentCommentID: parentCommentID}, nil
+		return &model.CommentResponse{ID: id, Comment: comment, AuthorID: user.ID, PostID: postID, ParentCommentID: parentCommentID}, nil
 	} else {
 		query = "INSERT INTO comment (id, comment, author_id, post_id, parrent_comment_id) VALUES ($1, $2, $3, $4, NULL)"
 		_, err := r.DB.ExecContext(ctx, query, id, comment, user.ID, itemId)
 		if err != nil {
 			return nil, err
 		}
-		return &model.CommentResponse{ID: id, Comment: commentText, AuthorID: user.ID, PostID: postID}, nil
+		return &model.CommentResponse{ID: id, Comment: comment, AuthorID: user.ID, PostID: postID}, nil
 	}
 }
 
