@@ -11,6 +11,7 @@ import (
 	"github.com/VadimRight/GraphQLOzon/internal/service"
 	"github.com/google/uuid"
 	"github.com/lib/pq"
+
 )
 
 
@@ -149,50 +150,6 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, username string, pa
 	return &user, nil
 }
 
-// Функция редактирования имени полльзователя (защищено токеном)
-func (r *mutationResolver) UpdateUserUsername(ctx context.Context, id string, username string) (*model.User, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := r.DB.ExecContext(ctx, "UPDATE users SET username=$2 WHERE id=$1", id, username)
-	if err != nil {
-		return nil, err
-	}
-	return &model.User{ID: id, Username: username}, nil
-}
-
-// Функция редактирования пароля (защищено токеном)
-func (r *mutationResolver) UpdateUserPassword(ctx context.Context, id string, password string) (*model.User, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := r.DB.ExecContext(ctx, "UPDATE users SET password=$2 WHERE id=$1", id, password)
-	if err != nil {
-		return nil, err
-	}
-	return &model.User{ID: id, Password: password}, nil
-}
-
-// Функция удаления собственной учетной записи (защищено токеном)
-func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.User, error) {
-	authUser := middleware.CtxValue(ctx)
-	if authUser == nil {
-		return nil, errors.New("unauthorized")
-	}
-	var user model.User
-	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username, &user.Password)
-	if err != nil {
-		return nil, err
-	}
-	_, err = r.DB.ExecContext(ctx, "DELETE FROM users WHERE id=$1", id)
-	if err != nil {
-		return nil, err
-	}
-	return &user, nil
-}
-
 func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 	rows, err := r.DB.QueryContext(ctx, "SELECT id, text, author_id FROM post")
 	if err != nil {
@@ -242,48 +199,18 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 	return &post, nil
 }
 
-func (r *mutationResolver) CreatePost(ctx context.Context, text string) (*model.Post, error) {
+func (r *mutationResolver) CreatePost(ctx context.Context, text string, permissionToComment bool) (*model.Post, error) {
 	user := middleware.CtxValue(ctx)
 	if user == nil {
 		return nil, errors.New("create post not auth")
 	}
 	fmt.Println(user.ID)
 	id := uuid.New().String()
-	_, err := r.DB.ExecContext(ctx, "INSERT INTO post (id, text, author_id) VALUES ($1, $2, $3)", id, text, user.ID)
+	_, err := r.DB.ExecContext(ctx, "INSERT INTO post (id, text, author_id, commentable) VALUES ($1, $2, $3, $4)", id, text, user.ID, permissionToComment)
 	if err != nil {
 		return nil, err
 	}
 	return &model.Post{ID: id, Text: text, AuthorID: user.ID}, nil
-}
-
-func (r *mutationResolver) UpdatePost(ctx context.Context, id string, text string) (*model.Post, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := r.DB.ExecContext(ctx, "UPDATE post SET text=$2 WHERE id=$1", id, text)
-	if err != nil {
-		return nil, err
-	}
-	return &model.Post{ID: id, Text: text}, nil
-}
-
-func (r *mutationResolver) DeletePost(ctx context.Context, id string) (*model.Post, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
-		return nil, errors.New("unauthorized")
-	}
-
-	var post model.Post
-	err := r.DB.QueryRowContext(ctx, "SELECT id, text, author_id FROM post WHERE id=$1", id).Scan(&post.ID, &post.Text, &post.AuthorID)
-	if err != nil {
-		return nil, err
-	}
-	_, err = r.DB.ExecContext(ctx, "DELETE FROM post WHERE id=$1", id)
-	if err != nil {
-		return nil, err
-	}
-	return &post, nil
 }
 
 func (r *queryResolver) Comments(ctx context.Context) ([]*model.CommentResponse, error) {
@@ -340,10 +267,17 @@ func (r *mutationResolver) CreateComment(ctx context.Context, comment string, it
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
+	var commentAble bool
+	err := r.DB.QueryRowContext(ctx, "SELECT commentable FROM post WHERE id=$1", itemId).Scan(&commentAble)
+	if err != nil {
+		return nil, err
+	} else if commentAble == false {
+		return nil, errors.New("Author turned off comments under this post")	
+	}
 	var isReply bool
 	var parentCommentID *string
 	var postID string
-	err := r.DB.QueryRowContext(ctx, "SELECT post_id FROM comment WHERE id=$1", itemId).Scan(&postID)
+	err = r.DB.QueryRowContext(ctx, "SELECT post_id FROM comment WHERE id=$1", itemId).Scan(&postID)
 	if err == sql.ErrNoRows {
 		postID = itemId
 		isReply = false		
@@ -370,17 +304,5 @@ func (r *mutationResolver) CreateComment(ctx context.Context, comment string, it
 		}
 		return &model.CommentResponse{ID: id, Comment: comment, AuthorID: user.ID, PostID: postID}, nil
 	}
-}
-
-func (r *mutationResolver) UpdateComment(ctx context.Context, id string, comment string) (*model.Comment, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
-		return nil, errors.New("unauthorized")
-	}
-	_, err := r.DB.ExecContext(ctx, "UPDATE comment SET comment=$2 WHERE id=$1", id, comment)
-	if err != nil {
-		return nil, err
-	}
-	return &model.Comment{ID: id, Comment: comment}, nil
 }
 

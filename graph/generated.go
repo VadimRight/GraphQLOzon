@@ -67,7 +67,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateComment      func(childComplexity int, comment string, itemID string) int
-		CreatePost         func(childComplexity int, text string) int
+		CreatePost         func(childComplexity int, text string, commentable bool) int
 		DeletePost         func(childComplexity int, id string) int
 		DeleteUser         func(childComplexity int, id string) int
 		LoginUser          func(childComplexity int, username string, password string) int
@@ -79,11 +79,12 @@ type ComplexityRoot struct {
 	}
 
 	Post struct {
-		Author   func(childComplexity int) int
-		AuthorID func(childComplexity int) int
-		Comments func(childComplexity int) int
-		ID       func(childComplexity int) int
-		Text     func(childComplexity int) int
+		Author      func(childComplexity int) int
+		AuthorID    func(childComplexity int) int
+		Commentable func(childComplexity int) int
+		Comments    func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Text        func(childComplexity int) int
 	}
 
 	Query struct {
@@ -115,7 +116,7 @@ type MutationResolver interface {
 	UpdateUserPassword(ctx context.Context, id string, password string) (*model.User, error)
 	UpdateUserUsername(ctx context.Context, id string, username string) (*model.User, error)
 	DeleteUser(ctx context.Context, id string) (*model.User, error)
-	CreatePost(ctx context.Context, text string) (*model.Post, error)
+	CreatePost(ctx context.Context, text string, commentable bool) (*model.Post, error)
 	UpdatePost(ctx context.Context, id string, text string) (*model.Post, error)
 	DeletePost(ctx context.Context, id string) (*model.Post, error)
 	CreateComment(ctx context.Context, comment string, itemID string) (*model.CommentResponse, error)
@@ -256,7 +257,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreatePost(childComplexity, args["text"].(string)), true
+		return e.complexity.Mutation.CreatePost(childComplexity, args["text"].(string), args["commentable"].(bool)), true
 
 	case "Mutation.deletePost":
 		if e.complexity.Mutation.DeletePost == nil {
@@ -367,6 +368,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Post.AuthorID(childComplexity), true
+
+	case "Post.commentable":
+		if e.complexity.Post.Commentable == nil {
+			break
+		}
+
+		return e.complexity.Post.Commentable(childComplexity), true
 
 	case "Post.comments":
 		if e.complexity.Post.Comments == nil {
@@ -659,6 +667,15 @@ func (ec *executionContext) field_Mutation_createPost_args(ctx context.Context, 
 		}
 	}
 	args["text"] = arg0
+	var arg1 bool
+	if tmp, ok := rawArgs["commentable"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentable"))
+		arg1, err = ec.unmarshalNBoolean2bool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["commentable"] = arg1
 	return args, nil
 }
 
@@ -1855,7 +1872,7 @@ func (ec *executionContext) _Mutation_createPost(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreatePost(rctx, fc.Args["text"].(string))
+		return ec.resolvers.Mutation().CreatePost(rctx, fc.Args["text"].(string), fc.Args["commentable"].(bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1890,6 +1907,8 @@ func (ec *executionContext) fieldContext_Mutation_createPost(ctx context.Context
 				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
 				return ec.fieldContext_Post_comments(ctx, field)
+			case "commentable":
+				return ec.fieldContext_Post_commentable(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -1957,6 +1976,8 @@ func (ec *executionContext) fieldContext_Mutation_updatePost(ctx context.Context
 				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
 				return ec.fieldContext_Post_comments(ctx, field)
+			case "commentable":
+				return ec.fieldContext_Post_commentable(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -2024,6 +2045,8 @@ func (ec *executionContext) fieldContext_Mutation_deletePost(ctx context.Context
 				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
 				return ec.fieldContext_Post_comments(ctx, field)
+			case "commentable":
+				return ec.fieldContext_Post_commentable(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -2428,6 +2451,50 @@ func (ec *executionContext) fieldContext_Post_comments(_ context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Post_commentable(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Post_commentable(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Commentable, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Post_commentable(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Post",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_userByUsername(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_userByUsername(ctx, field)
 	if err != nil {
@@ -2664,6 +2731,8 @@ func (ec *executionContext) fieldContext_Query_posts(_ context.Context, field gr
 				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
 				return ec.fieldContext_Post_comments(ctx, field)
+			case "commentable":
+				return ec.fieldContext_Post_commentable(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -2717,6 +2786,8 @@ func (ec *executionContext) fieldContext_Query_post(ctx context.Context, field g
 				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
 				return ec.fieldContext_Post_comments(ctx, field)
+			case "commentable":
+				return ec.fieldContext_Post_commentable(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -3217,6 +3288,8 @@ func (ec *executionContext) fieldContext_User_posts(_ context.Context, field gra
 				return ec.fieldContext_Post_author(ctx, field)
 			case "comments":
 				return ec.fieldContext_Post_comments(ctx, field)
+			case "commentable":
+				return ec.fieldContext_Post_commentable(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Post", field.Name)
 		},
@@ -5335,6 +5408,11 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "comments":
 			out.Values[i] = ec._Post_comments(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "commentable":
+			out.Values[i] = ec._Post_commentable(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

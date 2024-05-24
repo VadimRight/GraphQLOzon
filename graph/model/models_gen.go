@@ -24,11 +24,12 @@ type Mutation struct {
 }
 
 type Post struct {
-	ID       string             `json:"id"`
-	Text     string             `json:"text"`
-	AuthorID string             `json:"authorId"`
-	Author   *User              `json:"author"`
-	Comments []*CommentResponse `json:"comments"`
+	ID          string             `json:"id"`
+	Text        string             `json:"text"`
+	AuthorID    string             `json:"authorId"`
+	Author      *User              `json:"author"`
+	Comments    []*CommentResponse `json:"comments"`
+	Commentable bool               `json:"commentable"`
 }
 
 type Query struct {

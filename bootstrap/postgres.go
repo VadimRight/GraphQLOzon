@@ -50,6 +50,7 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 		id UUID PRIMARY KEY,
 		text TEXT NOT NULL,
 		author_id UUID NOT NULL,
+		commentable BOOLEAN NOT NULL,
 		FOREIGN KEY (author_id) REFERENCES users(id));
 	`)	
 	if err != nil {	log.Fatalf("%s: %v", op, err) }
