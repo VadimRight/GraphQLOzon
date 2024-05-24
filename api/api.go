@@ -12,6 +12,7 @@ import (
 	"github.com/VadimRight/GraphQLOzon/internal/middleware"
 )
 
+// Функция инициализации сервера
 func InitServer(cfg *bootstrap.Config, storage *bootstrap.Storage) {	
 	r := gin.Default()
 	r.Use(middleware.AuthMiddleware())
@@ -22,6 +23,7 @@ func InitServer(cfg *bootstrap.Config, storage *bootstrap.Storage) {
 	log.Fatal(r.Run(":8000"))
 }
 
+// Хэндлер для непосредственно нашей схемы GraphQL
 func graphqlHandler(storage *bootstrap.Storage) gin.HandlerFunc {
 	userService := service.NewUserService(*storage)
 	commentService := service.NewCommentService(*storage)
@@ -31,6 +33,7 @@ func graphqlHandler(storage *bootstrap.Storage) gin.HandlerFunc {
 	}
 }
 
+// Хендлер для песочницы, где можно отправлять HTTP запроса от клиента на сервер
 func playgroundHandler() gin.HandlerFunc {
 	h := playground.Handler("GraphQL", "/graphql")
 	return func(c *gin.Context) {

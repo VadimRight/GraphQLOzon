@@ -14,21 +14,24 @@ import (
 
 )
 
-
+// Тип Resolver, который ответственен за работу с данными в нашей схеме GraphQL
 type Resolver struct{
 	CommentService service.CommentService
 	UserService service.UserService
 	DB *sql.DB
 }
 
+// Функция возвращающая тип Запросов нашего резольвера
 func (r *Resolver) Query() QueryResolver {
 	return &queryResolver{r}
 }
 
+// Функция возвращающая тип Мутаций нашего резольверf
 func (r *Resolver) Mutation() MutationResolver {
 	return &mutationResolver{r}
 }
 
+// Типы используемых методов GraphqlQL - тип запросов (аналог GET) и мутации (запросы, способных изменить данные)
 type queryResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 
@@ -62,6 +65,7 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 	return users, nil
 }
 
+// Получения пользователя по его ID
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
 	var user model.User
 	err := r.DB.QueryRowContext(ctx, "SELECT id, username FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username)
@@ -82,7 +86,7 @@ func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error
 	return &user, nil
 }
 
-// Функция получения пользователя по ID
+// Функция получения пользователя по его нику
 func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*model.User, error) {
 	var user model.User
 	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE username=$1", username).Scan(&user.ID, &user.Username, &user.Password)
@@ -103,7 +107,7 @@ func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*m
 	return &user, nil
 }
 
-// Функция логина пользователя
+// Метод логина пользователя
 func (r *mutationResolver) LoginUser(ctx context.Context, username string, password string) (*model.Token, error) {
 	getUser, err := r.UserService.GetUserByUsername(ctx, username)
 	if err != nil {
@@ -122,7 +126,7 @@ func (r *mutationResolver) LoginUser(ctx context.Context, username string, passw
 	return &model.Token{Token: token}, nil
 }
 
-// Функция регистрации пользователя
+// Метод регистрации пользователя
 func (r *mutationResolver) RegisterUser(ctx context.Context, username string, password string) (*model.User, error) {
 	// Проверка инициализирован ли интерфейс UserService
 	if r.UserService == nil {
@@ -151,6 +155,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, username string, pa
 	return &user, nil
 }
 
+// Метод получения всех постов
 func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 	rows, err := r.DB.QueryContext(ctx, "SELECT id, text, author_id, commentable FROM post")
 	if err != nil {
@@ -180,6 +185,7 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 	return posts, nil
 }
 
+// Метод получения поста по его ID
 func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
 	var post model.Post
 	err := r.DB.QueryRowContext(ctx, "SELECT id, text, author_id, commentable FROM post WHERE id=$1", id).Scan(&post.ID, &post.Text, &post.AuthorID, &post.Commentable)
@@ -200,6 +206,7 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 	return &post, nil
 }
 
+// Метод создания поста
 func (r *mutationResolver) CreatePost(ctx context.Context, text string, permissionToComment bool) (*model.Post, error) {
 	user := middleware.CtxValue(ctx)
 	if user == nil {
@@ -213,7 +220,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, text string, permissi
 	}
 	return &model.Post{ID: id, Text: text, AuthorID: user.ID}, nil
 }
-
+// Метод получения всех коментариев
 func (r *queryResolver) Comments(ctx context.Context, limit *int, offset *int) ([]*model.CommentResponse, error) {
 	query := "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment"
 	params := []interface{}{}
@@ -257,6 +264,7 @@ func (r *queryResolver) Comments(ctx context.Context, limit *int, offset *int) (
 	return comments, nil
 }
 
+// Метод получения комментария по его ID
 func (r *queryResolver) Comment(ctx context.Context, id string) (*model.CommentResponse, error) {
 	var comment model.CommentResponse
 	err := r.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
@@ -277,6 +285,7 @@ func (r *queryResolver) Comment(ctx context.Context, id string) (*model.CommentR
 	return &comment, nil
 }
 
+// Метод создания комментария - метод универсален, что полностью удовльтворяет подраумиваемой просте архитектуры приложения - функция проверяет какой ID ей задают - ID поста или ID комментария и в заисисмости от этого применяет бизнес-логику либо для поста, либо для комментария
 func (r *mutationResolver) CreateComment(ctx context.Context, comment string, itemId string) (*model.CommentResponse, error) {
 	user := middleware.CtxValue(ctx)
 	if user == nil {
