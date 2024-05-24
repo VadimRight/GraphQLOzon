@@ -3,4 +3,6 @@
 Сервер предоставляет возможность оставлять посты и комментарии для его пользователей. Коментарии можно оставлять к другим коментариям.
 Комментарии организованы иерархически, позволяя вложенность без ограничений. При работе сервиса образуется деревовидное хранение данных в базе PostreSQL.
 ![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/2267ff20-1f97-4be3-945b-861be61711ba)
-![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/515ab9b8-f609-48de-8a00-10af6aa6c778)
+![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/62debdad-747f-4e4e-ac14-e680bbae7094)
+![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/3561079a-1b32-487e-8622-99db11014886)
+![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/b46da74e-9adf-43e3-a650-771724d19d0e)
