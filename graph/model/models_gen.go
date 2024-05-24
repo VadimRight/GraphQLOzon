@@ -11,23 +11,23 @@ type Comment struct {
 }
 
 type CommentResponse struct {
-	ID              string  `json:"id"`
-	Comment         string  `json:"comment"`
-	AuthorID        string  `json:"authorId"`
-	PostID          string  `json:"postId"`
-	ParentCommentID *string `json:"parentCommentID,omitempty"`
-	Author          *User   `json:"author"`
-	Replies		[]*CommentResponse
+	ID              string             `json:"id"`
+	Comment         string             `json:"comment"`
+	AuthorID        string             `json:"authorId"`
+	PostID          string             `json:"postId"`
+	ParentCommentID *string            `json:"parentCommentID,omitempty"`
+	Author          *User              `json:"author"`
+	Replies         []*CommentResponse `json:"replies"`
 }
 
 type Mutation struct {
 }
 
 type Post struct {
-	ID       string `json:"id"`
-	Text     string `json:"text"`
-	AuthorID string `json:"authorId"`
-	Author   *User  `json:"author"`
+	ID       string             `json:"id"`
+	Text     string             `json:"text"`
+	AuthorID string             `json:"authorId"`
+	Author   *User              `json:"author"`
 	Comments []*CommentResponse `json:"comments"`
 }
 
@@ -39,9 +39,9 @@ type Token struct {
 }
 
 type User struct {
-	ID       string     `json:"id"`
-	Username string     `json:"username"`
-	Password string     `json:"password"`
-	Posts    []*Post    `json:"posts"`
-	Comments []*Comment `json:"comments"`
+	ID       string             `json:"id"`
+	Username string             `json:"username"`
+	Password string             `json:"password"`
+	Posts    []*Post            `json:"posts"`
+	Comments []*CommentResponse `json:"comments"`
 }

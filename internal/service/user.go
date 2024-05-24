@@ -16,7 +16,7 @@ type UserService interface {
 	GetPostsByUserID(ctx context.Context, userID string) ([]*model.Post, error)
 	GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error)
 	GetCommentsByParentID(ctx context.Context, parentID string) ([]*model.CommentResponse, error)
-	GetCommentsByUserID(ctx context.Context, userID string) ([]*model.Comment, error)
+	GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error)
 	GetUserByID(ctx context.Context, userID string) (*model.User, error)
 }
 
@@ -139,17 +139,17 @@ func (s *userService) GetCommentsByParentID(ctx context.Context, parentID string
 	return comments, nil
 }
 
-func (s *userService) GetCommentsByUserID(ctx context.Context, userID string) ([]*model.Comment, error) {
-	rows, err := s.storage.DB.QueryContext(ctx, "SELECT id, comment, author_id, item_id FROM comment WHERE author_id=$1", userID)
+func (s *userService) GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error) {
+	rows, err := s.storage.DB.QueryContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE author_id=$1", userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var comments []*model.Comment
+	var comments []*model.CommentResponse
 	for rows.Next() {
-		var comment model.Comment
-		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.ItemID); err != nil {
+		var comment model.CommentResponse
+		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID); err != nil {
 			return nil, err
 		}
 		comments = append(comments, &comment)

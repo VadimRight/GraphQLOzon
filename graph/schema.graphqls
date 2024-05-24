@@ -5,7 +5,7 @@ type User {
   username: String!
   password: String!
   posts: [Post!]!
-  comments: [Comment!]!
+  comments: [CommentResponse!]!
 }
 
 type Post {
