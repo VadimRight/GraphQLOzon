@@ -5,7 +5,6 @@ import (
 	"github.com/VadimRight/GraphQLOzon/api"
 )
 
-
 func main() {
 	cfg := bootstrap.LoadConfig()
 	storage := bootstrap.InitPostgresDatabase(cfg)

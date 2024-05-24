@@ -16,7 +16,6 @@ import (
 
 // Тип Resolver, который ответственен за работу с данными в нашей схеме GraphQL
 type Resolver struct{
-	CommentService service.CommentService
 	UserService service.UserService
 	DB *sql.DB
 }
@@ -290,9 +289,6 @@ func (r *mutationResolver) CreateComment(ctx context.Context, comment string, it
 	user := middleware.CtxValue(ctx)
 	if user == nil {
 		return nil, errors.New("unauthorized")
-	}
-	if r.CommentService == nil {
-		return nil, errors.New("comment service is not initialized")
 	}
 
 	var isReply bool

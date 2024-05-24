@@ -1,6 +1,5 @@
 package api
 
-
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -26,8 +25,7 @@ func InitServer(cfg *bootstrap.Config, storage *bootstrap.Storage) {
 // Хэндлер для непосредственно нашей схемы GraphQL
 func graphqlHandler(storage *bootstrap.Storage) gin.HandlerFunc {
 	userService := service.NewUserService(*storage)
-	commentService := service.NewCommentService(*storage)
-	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{UserService: userService, CommentService: commentService, DB: storage.DB}}))
+	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{UserService: userService, DB: storage.DB}}))
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
