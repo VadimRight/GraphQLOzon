@@ -197,7 +197,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, text string) (*model.
 	if err != nil {
 		return nil, err
 	}
-	return &model.Post{ID: id, Text: text, AuthorID: user.Id}, nil
+	return &model.Post{ID: id, Text: text, AuthorID: user.ID}, nil
 }
 
 func (r *mutationResolver) UpdatePost(ctx context.Context, id string, text string) (*model.Post, error) {
@@ -258,18 +258,17 @@ func (r *queryResolver) Comment(ctx context.Context, id string) (*model.Comment,
 	return &comment, nil
 }
 
-func (r *mutationResolver) CreateComment(ctx context.Context, comment string, authorId string, itemId string) (*model.Comment, error) {
+func (r *mutationResolver) CreateComment(ctx context.Context, comment string, itemId string) (*model.Comment, error) {
 	user := middleware.CtxValue(ctx)
 	if user == nil {
-		return nil, errors.New("unauthorized")
+		return nil, errors.New("anauthorized")
 	}
-
 	id := uuid.New().String()
-	_, err := r.DB.ExecContext(ctx, "INSERT INTO comment (id, comment, author_id, item_id) VALUES ($1, $2, $3, $4)", id, comment, authorId, itemId)
+	_, err := r.DB.ExecContext(ctx, "INSERT INTO comment (id, comment, author_id, item_id) VALUES ($1, $2, $3, $4)", id, comment, user.ID, itemId)
 	if err != nil {
 		return nil, err
 	}
-	return &model.Comment{ID: id, Comment: comment, AuthorID: authorId, ItemID: itemId}, nil
+	return &model.Comment{ID: id, Comment: comment, AuthorID: user.ID, ItemID: itemId}, nil
 }
 
 func (r *mutationResolver) UpdateComment(ctx context.Context, id string, comment string) (*model.Comment, error) {

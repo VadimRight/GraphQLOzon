@@ -56,7 +56,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateComment      func(childComplexity int, comment string, authorID string, itemID string) int
+		CreateComment      func(childComplexity int, comment string, itemID string) int
 		CreatePost         func(childComplexity int, text string) int
 		DeleteComment      func(childComplexity int, id string) int
 		DeletePost         func(childComplexity int, id string) int
@@ -108,7 +108,7 @@ type MutationResolver interface {
 	CreatePost(ctx context.Context, text string) (*model.Post, error)
 	UpdatePost(ctx context.Context, id string, text string) (*model.Post, error)
 	DeletePost(ctx context.Context, id string) (*model.Post, error)
-	CreateComment(ctx context.Context, comment string, authorID string, itemID string) (*model.Comment, error)
+	CreateComment(ctx context.Context, comment string, itemID string) (*model.Comment, error)
 	UpdateComment(ctx context.Context, id string, comment string) (*model.Comment, error)
 	DeleteComment(ctx context.Context, id string) (*model.Comment, error)
 }
@@ -186,7 +186,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateComment(childComplexity, args["comment"].(string), args["authorId"].(string), args["itemId"].(string)), true
+		return e.complexity.Mutation.CreateComment(childComplexity, args["comment"].(string), args["itemId"].(string)), true
 
 	case "Mutation.createPost":
 		if e.complexity.Mutation.CreatePost == nil {
@@ -583,23 +583,14 @@ func (ec *executionContext) field_Mutation_createComment_args(ctx context.Contex
 	}
 	args["comment"] = arg0
 	var arg1 string
-	if tmp, ok := rawArgs["authorId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorId"))
+	if tmp, ok := rawArgs["itemId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemId"))
 		arg1, err = ec.unmarshalNID2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["authorId"] = arg1
-	var arg2 string
-	if tmp, ok := rawArgs["itemId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemId"))
-		arg2, err = ec.unmarshalNID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["itemId"] = arg2
+	args["itemId"] = arg1
 	return args, nil
 }
 
@@ -1688,7 +1679,7 @@ func (ec *executionContext) _Mutation_createComment(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateComment(rctx, fc.Args["comment"].(string), fc.Args["authorId"].(string), fc.Args["itemId"].(string))
+		return ec.resolvers.Mutation().CreateComment(rctx, fc.Args["comment"].(string), fc.Args["itemId"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
