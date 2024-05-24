@@ -17,6 +17,7 @@ type CommentResponse struct {
 	PostID          string  `json:"postId"`
 	ParentCommentID *string `json:"parentCommentID,omitempty"`
 	Author          *User   `json:"author"`
+	Replies		[]*CommentResponse
 }
 
 type Mutation struct {
@@ -27,6 +28,7 @@ type Post struct {
 	Text     string `json:"text"`
 	AuthorID string `json:"authorId"`
 	Author   *User  `json:"author"`
+	Comments []*CommentResponse `json:"comments"`
 }
 
 type Query struct {
