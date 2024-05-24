@@ -11,6 +11,8 @@ import (
 type UserService interface {
 	GetUserByUsername(ctx context.Context, username string) (*model.User, error)
 	UserCreate(ctx context.Context, username string, password string) (*model.User, error)
+	HashPassword(password string) string
+	ComparePassword(hashed string, normal string) error
 }
 
 type userService struct {

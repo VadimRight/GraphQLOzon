@@ -73,8 +73,8 @@ func (r *mutationResolver) LoginUser(ctx context.Context, username string, passw
 		}
 		return nil, err
 	}
-	if getUser.Password != password {
-		return nil, errors.New("Password incorrect")
+	if err := r.UserService.ComparePassword(getUser.Password, password); err != nil {
+		return nil, err
 	}
 	token, err := service.JwtGenerate(ctx, getUser.ID)
 	if err != nil {
@@ -94,7 +94,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, username string, pa
 	if err == nil {
 		return nil, errors.New("user already exists")
 	}
-
+	password = r.UserService.HashPassword(password)
 	// Create the user if they don't exist
 	createdUser, err := r.UserService.UserCreate(ctx, username, password)
 	if err != nil {
