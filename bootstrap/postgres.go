@@ -27,6 +27,8 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 	if err != nil {
 		log.Fatalf("%s: %v", op, err)
 	}
+
+	// Создание таблицы поользователя, у которго есть зашифрованный пароль, имя и уникальный ID 
 	createUserTable, err := db.Prepare(`
 	CREATE TABLE IF NOT EXISTS users (
 		id UUID PRIMARY KEY,
@@ -37,6 +39,7 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 	_, err = createUserTable.Exec()
 	if err != nil {	log.Fatalf("%s: %v", op, err) }
 
+	// Создание таблицы постов, у которых есть текст, уникальный ID, а также ID пользователя, написавшего пост
 	createPostTable, err := db.Prepare(`
 	CREATE TABLE IF NOT EXISTS post (
 		id UUID PRIMARY KEY,
@@ -48,6 +51,7 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 	_, err = createPostTable.Exec()
 	if err != nil {	log.Fatalf("%s: %v", op, err) }
 
+	// Создание таблицы комментариев, у которых есть сам текст комменатария, ID пользователя, оставившего комментарий, а также ID того, на что был создан комментарий. Поскольку привязка к посту или комментарию происходит с помощью item_id, который не является FOREIGN KEY ни для какой таблицы, это позволяет нам оставлять коментарии любой глубины и уменьшит нагрузку на базу данных 
 	createCommentTable, err := db.Prepare(`
 	CREATE TABLE IF NOT EXISTS comment (
 		id UUID PRIMARY KEY,
