@@ -24,7 +24,8 @@ func InitServer(cfg *bootstrap.Config, storage *bootstrap.Storage) {
 
 func graphqlHandler(storage *bootstrap.Storage) gin.HandlerFunc {
 	userService := service.NewUserService(*storage)
-	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{UserService: userService, DB: storage.DB}}))
+	commentService := service.NewCommentService(*storage)
+	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{UserService: userService, CommentService: commentService, DB: storage.DB}}))
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
