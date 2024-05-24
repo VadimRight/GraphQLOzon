@@ -94,7 +94,6 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, username string, pa
 	if r.UserService == nil {
 		return nil, errors.New("user service is not initialized")
 	}
-
 	// Проверка существует ли пользователь уже в базе данных
 	_, err := r.UserService.GetUserByUsername(ctx, username)
 	if err == nil {
@@ -106,12 +105,10 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, username string, pa
 	if err != nil {
 		return nil, err
 	}
-
 	// Проверка успешности создания пользователя
 	if createdUser == nil {
 		return nil, errors.New("failed to create user")
 	}
-
 	user := model.User{
 		ID:       createdUser.ID,
 		Username: username,
@@ -126,7 +123,6 @@ func (r *mutationResolver) UpdateUserUsername(ctx context.Context, id string, us
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
-
 	_, err := r.DB.ExecContext(ctx, "UPDATE users SET username=$2 WHERE id=$1", id, username)
 	if err != nil {
 		return nil, err
@@ -140,7 +136,6 @@ func (r *mutationResolver) UpdateUserPassword(ctx context.Context, id string, pa
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
-
 	_, err := r.DB.ExecContext(ctx, "UPDATE users SET password=$2 WHERE id=$1", id, password)
 	if err != nil {
 		return nil, err
@@ -154,7 +149,6 @@ func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.Us
 	if authUser == nil {
 		return nil, errors.New("unauthorized")
 	}
-
 	var user model.User
 	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username, &user.Password)
 	if err != nil {
@@ -173,7 +167,6 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 		return nil, err
 	}
 	defer rows.Close()
-
 	var posts []*model.Post
 	for rows.Next() {
 		var post model.Post
@@ -213,7 +206,6 @@ func (r *mutationResolver) UpdatePost(ctx context.Context, id string, text strin
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
-
 	_, err := r.DB.ExecContext(ctx, "UPDATE post SET text=$2 WHERE id=$1", id, text)
 	if err != nil {
 		return nil, err
@@ -245,7 +237,6 @@ func (r *queryResolver) Comments(ctx context.Context) ([]*model.CommentResponse,
 		return nil, err
 	}
 	defer rows.Close()
-
 	var comments []*model.CommentResponse
 	for rows.Next() {
 		var comment model.CommentResponse
@@ -308,7 +299,6 @@ func (r *mutationResolver) UpdateComment(ctx context.Context, id string, comment
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
-
 	_, err := r.DB.ExecContext(ctx, "UPDATE comment SET comment=$2 WHERE id=$1", id, comment)
 	if err != nil {
 		return nil, err
