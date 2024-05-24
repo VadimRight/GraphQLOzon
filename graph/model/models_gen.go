@@ -29,6 +29,7 @@ type Post struct {
 	AuthorID string             `json:"authorId"`
 	Author   *User              `json:"author"`
 	Comments []*CommentResponse `json:"comments"`
+	CommentAble bool	`json:"commentable"`
 }
 
 type Query struct {

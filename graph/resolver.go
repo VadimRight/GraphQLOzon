@@ -242,14 +242,14 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 	return &post, nil
 }
 
-func (r *mutationResolver) CreatePost(ctx context.Context, text string) (*model.Post, error) {
+func (r *mutationResolver) CreatePost(ctx context.Context, text string, permissionToComment bool) (*model.Post, error) {
 	user := middleware.CtxValue(ctx)
 	if user == nil {
 		return nil, errors.New("create post not auth")
 	}
 	fmt.Println(user.ID)
 	id := uuid.New().String()
-	_, err := r.DB.ExecContext(ctx, "INSERT INTO post (id, text, author_id) VALUES ($1, $2, $3)", id, text, user.ID)
+	_, err := r.DB.ExecContext(ctx, "INSERT INTO post (id, text, author_id, commentable) VALUES ($1, $2, $3, $4)", id, text, user.ID, permissionToComment)
 	if err != nil {
 		return nil, err
 	}
@@ -340,10 +340,15 @@ func (r *mutationResolver) CreateComment(ctx context.Context, comment string, it
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
+	var commentAble bool
+	err := r.DB.QueryRowContext(ctx, "SELECT commentable FROM post WHERE id=$1", itemId).Scan(&commentAble)
+	if err != nil {
+		return nil, errors.New("Author of this post turned off comments")
+	}
 	var isReply bool
 	var parentCommentID *string
 	var postID string
-	err := r.DB.QueryRowContext(ctx, "SELECT post_id FROM comment WHERE id=$1", itemId).Scan(&postID)
+	err = r.DB.QueryRowContext(ctx, "SELECT post_id FROM comment WHERE id=$1", itemId).Scan(&postID)
 	if err == sql.ErrNoRows {
 		postID = itemId
 		isReply = false		
