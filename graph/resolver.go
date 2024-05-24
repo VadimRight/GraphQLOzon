@@ -44,28 +44,60 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 		if err := rows.Scan(&user.ID, &user.Username); err != nil {
 			return nil, err
 		}
+
+		user.Posts, err = r.getPostsByUserID(ctx, user.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		user.Comments, err = r.getCommentsByUserID(ctx, user.ID)
+		if err != nil {
+			return nil, err
+		}
+
 		users = append(users, &user)
 	}
 	return users, nil
 }
 
-// Функция получения пользователя по ID
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
 	var user model.User
-	err := r.DB.QueryRowContext(ctx, "SELECT id, username FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username, &user.Password)
+	err := r.DB.QueryRowContext(ctx, "SELECT id, username FROM users WHERE id=$1", id).Scan(&user.ID, &user.Username)
 	if err != nil {
 		return nil, err
 	}
+
+	user.Posts, err = r.getPostsByUserID(ctx, user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	user.Comments, err = r.getCommentsByUserID(ctx, user.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &user, nil
 }
 
-// Функция получения пользователя по его имени
+// Функция получения пользователя по ID
 func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*model.User, error) {
 	var user model.User
 	err := r.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE username=$1", username).Scan(&user.ID, &user.Username, &user.Password)
 	if err != nil {
 		return nil, err
 	}
+
+	user.Posts, err = r.getPostsByUserID(ctx, user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	user.Comments, err = r.getCommentsByUserID(ctx, user.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &user, nil
 }
 
@@ -167,12 +199,24 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 		return nil, err
 	}
 	defer rows.Close()
+
 	var posts []*model.Post
 	for rows.Next() {
 		var post model.Post
 		if err := rows.Scan(&post.ID, &post.Text, &post.AuthorID); err != nil {
 			return nil, err
 		}
+
+		post.Author, err = r.getUserByID(ctx, post.AuthorID)
+		if err != nil {
+			return nil, err
+		}
+
+		post.Comments, err = r.getCommentsByPostID(ctx, post.ID)
+		if err != nil {
+			return nil, err
+		}
+
 		posts = append(posts, &post)
 	}
 	return posts, nil
@@ -184,6 +228,17 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 	if err != nil {
 		return nil, err
 	}
+
+	post.Author, err = r.getUserByID(ctx, post.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+
+	post.Comments, err = r.getCommentsByPostID(ctx, post.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &post, nil
 }
 
@@ -237,12 +292,24 @@ func (r *queryResolver) Comments(ctx context.Context) ([]*model.CommentResponse,
 		return nil, err
 	}
 	defer rows.Close()
+
 	var comments []*model.CommentResponse
 	for rows.Next() {
 		var comment model.CommentResponse
 		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID); err != nil {
 			return nil, err
 		}
+
+		comment.Author, err = r.getUserByID(ctx, comment.AuthorID)
+		if err != nil {
+			return nil, err
+		}
+
+		comment.Replies, err = r.getCommentsByParentID(ctx, comment.ID)
+		if err != nil {
+			return nil, err
+		}
+
 		comments = append(comments, &comment)
 	}
 	return comments, nil
@@ -254,6 +321,17 @@ func (r *queryResolver) Comment(ctx context.Context, id string) (*model.CommentR
 	if err != nil {
 		return nil, err
 	}
+
+	comment.Author, err = r.getUserByID(ctx, comment.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+
+	comment.Replies, err = r.getCommentsByParentID(ctx, comment.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &comment, nil
 }
 
