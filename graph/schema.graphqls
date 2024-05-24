@@ -27,7 +27,7 @@ type Comment {
 
 type Query {
   userByUsername(username: String!): User!
-  users: [User!]!
+  users: [username: String!]!: User!
   user(id: ID!): User
   posts: [Post!]!
   post(id: ID!): Post
