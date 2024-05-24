@@ -52,8 +52,8 @@ func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
 }
 
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
+	authUser := middleware.CtxValue(ctx)
+	if authUser == nil {
 		return nil, errors.New("unauthorized")
 	}
 
@@ -130,8 +130,8 @@ func (r *mutationResolver) UpdateUserPassword(ctx context.Context, id string, pa
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, id string) (*model.User, error) {
-	user := middleware.CtxValue(ctx)
-	if user == nil {
+	authUser := middleware.CtxValue(ctx)
+	if authUser == nil {
 		return nil, errors.New("unauthorized")
 	}
 

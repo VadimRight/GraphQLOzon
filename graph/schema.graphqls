@@ -1,4 +1,7 @@
 # graph/schema.graphqls
+
+directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
 type User {
   id: ID!
   username: String!
@@ -23,6 +26,7 @@ type Comment {
 }
 
 type Query {
+  userByUsername(username: String!): User!
   users: [User!]!
   user(id: ID!): User
   posts: [Post!]!
@@ -32,7 +36,9 @@ type Query {
 }
 
 type Mutation {
-  createUser(username: String!, password: String!): User!
+  loginUser(username: String!, password: String!): Token! @goField(forceResolver: true)
+  registerUser(username: String!, password: String!): User!
+
   updateUserPassword(id: ID!, password: String!): User!
   updateUserUsername(id: ID!, username: String!): User!
   deleteUser(id: ID!): User!
@@ -44,4 +50,8 @@ type Mutation {
   createComment(comment: String!, authorId: ID!, itemId: ID!): Comment!
   updateComment(id: ID!, comment: String!): Comment!
   deleteComment(id: ID!): Comment!
+}
+
+type Token {
+  token: String!
 }

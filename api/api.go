@@ -8,10 +8,12 @@ import (
 	"github.com/VadimRight/GraphQLOzon/graph"
 	"github.com/VadimRight/GraphQLOzon/bootstrap"
 	"log"
+	"github.com/VadimRight/GraphQLOzon/internal/middleware"
 )
 
 func InitServer(cfg *bootstrap.Config, storage *bootstrap.Storage) {	
 	r := gin.Default()
+	r.Use(middleware.AuthMiddleware())
 	r.POST("/graphql", graphqlHandler(storage))
 	r.GET("/", playgroundHandler())
 
