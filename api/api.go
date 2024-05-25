@@ -5,6 +5,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/VadimRight/GraphQLOzon/graph"
+	"github.com/VadimRight/GraphQLOzon/storage"
 	"github.com/VadimRight/GraphQLOzon/bootstrap"
 	"log"
 	"github.com/VadimRight/GraphQLOzon/internal/service"
@@ -12,7 +13,7 @@ import (
 )
 
 // Функция инициализации сервера
-func InitServer(cfg *bootstrap.Config, storage *bootstrap.PostgresStorage) {	
+func InitServer(cfg *bootstrap.Config, storage *storage.PostgresStorage) {	
 	r := gin.Default()
 	r.Use(middleware.AuthMiddleware())
 	r.POST("/graphql", graphqlHandler(storage))
@@ -23,7 +24,7 @@ func InitServer(cfg *bootstrap.Config, storage *bootstrap.PostgresStorage) {
 }
 
 // Хэндлер для непосредственно нашей схемы GraphQL
-func graphqlHandler(storage *bootstrap.PostgresStorage) gin.HandlerFunc {
+func graphqlHandler(storage *storage.PostgresStorage) gin.HandlerFunc {
 	userService := service.NewUserService(*storage)
 	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{UserService: userService, DB: storage.DB}}))
 	return func(c *gin.Context) {

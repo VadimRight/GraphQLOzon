@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/VadimRight/GraphQLOzon/graph/model"
-	"github.com/VadimRight/GraphQLOzon/bootstrap"
+	"github.com/VadimRight/GraphQLOzon/storage"
 	"github.com/lib/pq"
 )
 
@@ -23,11 +23,11 @@ type UserService interface {
 
 // Тип сервиса пользователей
 type userService struct {
-	storage bootstrap.PostgresStorage
+	storage storage.PostgresStorage
 }
 
 // Функция инициализации сервиса пользователей для запуска сервера с GraphQL Playground, бизнес-логика которого храниться в graph/resolver.go, но вызов просиходит в bootstrap/api.go 
-func NewUserService(storage bootstrap.PostgresStorage) UserService {
+func NewUserService(storage storage.PostgresStorage) UserService {
 	return &userService{storage: storage}
 }
 
