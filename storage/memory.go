@@ -6,6 +6,7 @@ import (
 	"sync"
 	"github.com/VadimRight/GraphQLOzon/graph/model"
 	"github.com/google/uuid"
+	"errors"
 )
 
 type InMemoryStorage struct {
@@ -173,8 +174,40 @@ func (s *InMemoryStorage) GetCommentByID(ctx context.Context, id string) (*model
 func (s *InMemoryStorage) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
+	var isReply bool
+	var parentCommentID *string
+	var postID string
+	var commentAble bool
+
+	// Сначала проверяем, является ли itemId постом и включены ли комментарии
+	if post, exists := s.posts[itemId]; exists {
+		// itemId является постом
+		postID = itemId
+		isReply = false
+		commentAble = post.Commentable
+		if !commentAble {
+			return nil, errors.New("author turned off comments under this post")
+		}
+	} else if comment, exists := s.comments[itemId]; exists {
+		// itemId является комментарием
+		postID = comment.PostID
+		parentCommentID = &itemId
+		isReply = true
+	} else {
+		return nil, errors.New("item not found")
+	}
+
 	id := uuid.New().String()
-	comment := &model.CommentResponse{ID: id, Comment: commentText, AuthorID: userID, PostID: itemId}
-	s.comments[id] = comment
-	return comment, nil
+	var newComment *model.CommentResponse
+	if isReply {
+		// Если это ответ на комментарий
+		newComment = &model.CommentResponse{ID: id, Comment: commentText, AuthorID: userID, PostID: postID, ParentCommentID: parentCommentID}
+	} else {
+		// Если это комментарий к посту
+		newComment = &model.CommentResponse{ID: id, Comment: commentText, AuthorID: userID, PostID: postID}
+	}
+	s.comments[id] = newComment
+
+	return newComment, nil
 }
