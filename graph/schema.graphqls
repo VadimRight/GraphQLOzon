@@ -12,7 +12,7 @@ type Post {
   id: ID!
   text: String!
   authorId: ID!
-  author: User!
+  authorPost: User!
   comments: [CommentResponse!]!
   commentable: Boolean!
 }
@@ -22,7 +22,7 @@ type Comment {
   comment: String!
   authorId: ID!
   itemId: ID!
-  author: User!
+  authorComment: User!
 }
 
 
@@ -32,7 +32,7 @@ type CommentResponse {
   authorId: ID!
   postId: ID!
   parentCommentID: ID
-  author: User!
+  authorComment: User!
   replies: [CommentResponse!]!
 }
 
