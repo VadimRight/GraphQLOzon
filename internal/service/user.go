@@ -23,11 +23,11 @@ type UserService interface {
 
 // Тип сервиса пользователей
 type userService struct {
-	storage bootstrap.Storage
+	storage bootstrap.PostgresStorage
 }
 
 // Функция инициализации сервиса пользователей для запуска сервера с GraphQL Playground, бизнес-логика которого храниться в graph/resolver.go, но вызов просиходит в bootstrap/api.go 
-func NewUserService(storage bootstrap.Storage) UserService {
+func NewUserService(storage bootstrap.PostgresStorage) UserService {
 	return &userService{storage: storage}
 }
 

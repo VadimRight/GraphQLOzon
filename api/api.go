@@ -12,7 +12,7 @@ import (
 )
 
 // Функция инициализации сервера
-func InitServer(cfg *bootstrap.Config, storage *bootstrap.Storage) {	
+func InitServer(cfg *bootstrap.Config, storage *bootstrap.PostgresStorage) {	
 	r := gin.Default()
 	r.Use(middleware.AuthMiddleware())
 	r.POST("/graphql", graphqlHandler(storage))
@@ -23,7 +23,7 @@ func InitServer(cfg *bootstrap.Config, storage *bootstrap.Storage) {
 }
 
 // Хэндлер для непосредственно нашей схемы GraphQL
-func graphqlHandler(storage *bootstrap.Storage) gin.HandlerFunc {
+func graphqlHandler(storage *bootstrap.PostgresStorage) gin.HandlerFunc {
 	userService := service.NewUserService(*storage)
 	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{UserService: userService, DB: storage.DB}}))
 	return func(c *gin.Context) {

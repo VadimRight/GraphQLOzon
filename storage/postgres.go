@@ -16,6 +16,7 @@ type PostgresStorage struct {
 
 // Все SQL запросы и функции работы с базой данных храняться в файле graph/resolver.go, а также вспомогательные запросы для обеспечения функционала схемы и резольвера храняться в сервисе пользователей в internal/service/user.go
 
+// Функция возвращающая объект PostgresStorage
 func NewPostgresStorage(db *sql.DB) *PostgresStorage {
     return &PostgresStorage{DB: db}
 }
