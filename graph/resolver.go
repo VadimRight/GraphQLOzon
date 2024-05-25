@@ -33,29 +33,158 @@ type queryResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 
 // Функция получения всех пользователей
-func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+func (r *queryResolver) Users(ctx context.Context, limit, offset *int) ([]*model.User, error) {
 	users, err := r.UserService.GetAllUsers(ctx)
 	if err != nil {
 		return nil, err
 	}
+
+	for _, user := range users {
+		// Получаем посты для пользователя
+		user.Posts, err = r.PostService.GetPostsByUserID(ctx, user.ID, limit, offset)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, post := range user.Posts {
+			// Заполняем автора поста
+			post.AuthorPost, err = r.UserService.GetUserByID(ctx, post.AuthorID)
+			if err != nil {
+				return nil, err
+			}
+
+			// Получаем комментарии для поста
+			post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, comment := range post.Comments {
+				// Заполняем автора комментария
+				comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+				if err != nil {
+					return nil, err
+				}
+
+				// Получаем ответы для каждого комментария
+				comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
+				if err != nil {
+					return nil, err
+				}
+
+				for _, reply := range comment.Replies {
+					// Заполняем автора ответа
+					reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+					if err != nil {
+						return nil, err
+					}
+				}
+			}
+		}
+	}
+
 	return users, nil
 }
 
 // Получения пользователя по его ID
-func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+func (r *queryResolver) User(ctx context.Context, id string, limit, offset *int) (*model.User, error) {
 	user, err := r.UserService.GetUserByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
+
+	// Получаем посты для пользователя
+	user.Posts, err = r.PostService.GetPostsByUserID(ctx, user.ID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, post := range user.Posts {
+		// Заполняем автора поста
+		post.AuthorPost, err = r.UserService.GetUserByID(ctx, post.AuthorID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Получаем комментарии для поста
+		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, comment := range post.Comments {
+			// Заполняем автора комментария
+			comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+			if err != nil {
+				return nil, err
+			}
+
+			// Получаем ответы для каждого комментария
+			comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, reply := range comment.Replies {
+				// Заполняем автора ответа
+				reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
 	return user, nil
 }
 
-// Функция получения пользователя по его нику
 func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*model.User, error) {
 	user, err := r.UserService.GetUserByUsername(ctx, username)
 	if err != nil {
 		return nil, err
 	}
+
+	// Получение постов пользователя
+	user.Posts, err = r.PostService.GetPostsByUserID(ctx, user.ID, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, post := range user.Posts {
+		// Заполнение автора поста
+		post.AuthorPost, err = r.UserService.GetUserByID(ctx, post.AuthorID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Получение комментариев для поста
+		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, nil, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, comment := range post.Comments {
+			// Заполнение автора комментария
+			comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+			if err != nil {
+				return nil, err
+			}
+
+			// Получение ответов для каждого комментария
+			comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, nil, nil)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, reply := range comment.Replies {
+				// Заполнение автора ответа
+				reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
+
 	return user, nil
 }
 
@@ -90,29 +219,138 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, username string, pa
 }
 
 // Метод получения всех постов
-func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
-	posts, err := r.PostService.GetAllPosts(ctx)
+func (r *queryResolver) Posts(ctx context.Context, limit, offset *int) ([]*model.Post, error) {
+	posts, err := r.PostService.GetAllPosts(ctx, limit, offset)
 	if err != nil {
 		return nil, err
 	}
+
+	for _, post := range posts {
+		// Заполняем автора поста
+		post.AuthorPost, err = r.UserService.GetUserByID(ctx, post.AuthorID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Получаем комментарии для поста
+		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, comment := range post.Comments {
+			// Заполняем автора комментария
+			comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+			if err != nil {
+				return nil, err
+			}
+
+			// Получаем ответы для каждого комментария
+			comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, reply := range comment.Replies {
+				// Заполняем автора ответа
+				reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
+
 	return posts, nil
 }
 
 // Метод получения постов по ID пользователя
-func (r *queryResolver) PostsByUserID(ctx context.Context, userID string) ([]*model.Post, error) {
-	posts, err := r.PostService.GetPostsByUserID(ctx, userID)
+func (r *queryResolver) PostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error) {
+	posts, err := r.PostService.GetPostsByUserID(ctx, userID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
+
+	for _, post := range posts {
+		// Заполняем автора поста
+		post.AuthorPost, err = r.UserService.GetUserByID(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Получаем комментарии для поста
+		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, comment := range post.Comments {
+			// Заполняем автора комментария
+			comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+			if err != nil {
+				return nil, err
+			}
+
+			// Получаем ответы для каждого комментария
+			comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, reply := range comment.Replies {
+				// Заполняем автора ответа
+				reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
+
 	return posts, nil
 }
 
 // Метод получения поста по его ID
-func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
+func (r *queryResolver) Post(ctx context.Context, id string, limit, offset *int) (*model.Post, error) {
 	post, err := r.PostService.GetPostByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
+
+	// Заполняем автора поста
+	post.AuthorPost, err = r.UserService.GetUserByID(ctx, post.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Получаем комментарии для поста
+	post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, comment := range post.Comments {
+		// Заполняем автора комментария
+		comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Получаем ответы для каждого комментария
+		comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, reply := range comment.Replies {
+			// Заполняем автора ответа
+			reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	return post, nil
 }
 
@@ -131,21 +369,65 @@ func (r *mutationResolver) CreatePost(ctx context.Context, text string, permissi
 	return post, nil
 }
 
-// Метод получения всех коментариев
-func (r *queryResolver) Comments(ctx context.Context, limit *int, offset *int) ([]*model.CommentResponse, error) {
+// Метод получения всех комментариев
+func (r *queryResolver) Comments(ctx context.Context, limit, offset *int) ([]*model.CommentResponse, error) {
 	comments, err := r.CommentService.GetAllComments(ctx, limit, offset)
 	if err != nil {
 		return nil, err
 	}
+
+	for _, comment := range comments {
+		// Заполняем автора комментария
+		comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Получаем ответы для каждого комментария
+		comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, reply := range comment.Replies {
+			// Заполняем автора ответа
+			reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	return comments, nil
 }
 
 // Метод получения комментария по его ID
-func (r *queryResolver) Comment(ctx context.Context, id string) (*model.CommentResponse, error) {
+func (r *queryResolver) Comment(ctx context.Context, id string, limit, offset *int) (*model.CommentResponse, error) {
 	comment, err := r.CommentService.GetCommentByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
+
+	// Заполняем автора комментария
+	comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Получаем ответы для комментария с поддержкой пагинации
+	comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, reply := range comment.Replies {
+		// Заполняем автора ответа
+		reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return comment, nil
 }
 

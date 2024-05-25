@@ -12,7 +12,7 @@ type Post {
   id: ID!
   text: String!
   authorId: ID!
-  author: User!
+  authorPost: User!
   comments: [CommentResponse!]!
   commentable: Boolean!
 }
@@ -22,9 +22,8 @@ type Comment {
   comment: String!
   authorId: ID!
   itemId: ID!
-  author: User!
+  authorComment: User!
 }
-
 
 type CommentResponse {
   id: ID!
@@ -32,19 +31,19 @@ type CommentResponse {
   authorId: ID!
   postId: ID!
   parentCommentID: ID
-  author: User!
+  authorComment: User!
   replies: [CommentResponse!]!
 }
 
 type Query {
   userByUsername(username: String!): User!
-  users: [User!]!
-  user(id: ID!): User
-  posts: [Post!]!
-  post(id: ID!): Post
-  postsByUserID(userID: ID!): [Post!]! 
+  users(limit: Int, offset: Int): [User!]!
+  user(id: ID!, limit: Int, offset: Int): User
+  posts(limit: Int, offset: Int): [Post!]!
+  post(id: ID!, limit: Int, offset: Int): Post
+  postsByUserID(userID: ID!, limit: Int, offset: Int): [Post!]! 
   comments(limit: Int, offset: Int): [CommentResponse!]!
-  comment(id: ID!): CommentResponse
+  comment(id: ID!, limit: Int, offset: Int): CommentResponse
 }
 
 type Mutation {

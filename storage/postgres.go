@@ -136,8 +136,18 @@ func (s *PostgresStorage) GetAllUsers(ctx context.Context) ([]*model.User, error
 	return users, nil
 }
 
-func (s *PostgresStorage) GetPostsByUserID(ctx context.Context, userID string) ([]*model.Post, error) {
-	rows, err := s.DB.QueryContext(ctx, "SELECT id, text, author_id, commentable FROM post WHERE author_id=$1", userID)
+func (s *PostgresStorage) GetAllPosts(ctx context.Context, limit, offset *int) ([]*model.Post, error) {
+	query := "SELECT id, text, author_id, commentable FROM post"
+	var rows *sql.Rows
+	var err error
+
+	if limit != nil && offset != nil {
+		query += " LIMIT $1 OFFSET $2"
+		rows, err = s.DB.QueryContext(ctx, query, *limit, *offset)
+	} else {
+		rows, err = s.DB.QueryContext(ctx, query)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -154,8 +164,18 @@ func (s *PostgresStorage) GetPostsByUserID(ctx context.Context, userID string) (
 	return posts, nil
 }
 
-func (s *PostgresStorage) GetAllPosts(ctx context.Context) ([]*model.Post, error) {
-	rows, err := s.DB.QueryContext(ctx, "SELECT id, text, author_id, commentable FROM post")
+func (s *PostgresStorage) GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error) {
+	query := "SELECT id, text, author_id, commentable FROM post WHERE author_id = $1"
+	var rows *sql.Rows
+	var err error
+
+	if limit != nil && offset != nil {
+		query += " LIMIT $2 OFFSET $3"
+		rows, err = s.DB.QueryContext(ctx, query, userID, *limit, *offset)
+	} else {
+		rows, err = s.DB.QueryContext(ctx, query, userID)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -221,8 +241,20 @@ func (s *PostgresStorage) GetAllComments(ctx context.Context, limit, offset *int
 	return comments, nil
 }
 
-func (s *PostgresStorage) GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error) {
-	rows, err := s.DB.QueryContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE post_id=$1", postID)
+func (s *PostgresStorage) GetCommentsByPostID(ctx context.Context, postID string, limit, offset *int) ([]*model.CommentResponse, error) {
+	query := "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE post_id=$1"
+	args := []interface{}{postID}
+
+	if limit != nil {
+		query += " LIMIT $2"
+		args = append(args, *limit)
+	}
+	if offset != nil {
+		query += " OFFSET $3"
+		args = append(args, *offset)
+	}
+
+	rows, err := s.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -231,7 +263,8 @@ func (s *PostgresStorage) GetCommentsByPostID(ctx context.Context, postID string
 	var comments []*model.CommentResponse
 	for rows.Next() {
 		var comment model.CommentResponse
-		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID); err != nil {
+		err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
+		if err != nil {
 			return nil, err
 		}
 		comments = append(comments, &comment)
@@ -239,22 +272,51 @@ func (s *PostgresStorage) GetCommentsByPostID(ctx context.Context, postID string
 	return comments, nil
 }
 
-func (s *PostgresStorage) GetCommentsByParentID(ctx context.Context, parentID string) ([]*model.CommentResponse, error) {
-	rows, err := s.DB.QueryContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE parent_comment_id=$1", parentID)
+func (s *PostgresStorage) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
+	query := "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE parent_comment_id=$1"
+
+	// Добавляем лимит и смещение, если они заданы
+	if limit != nil && offset != nil {
+		query += " LIMIT $2 OFFSET $3"
+		rows, err := s.DB.QueryContext(ctx, query, parentID, *limit, *offset)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+		return scanComments(rows)
+	}
+
+	rows, err := s.DB.QueryContext(ctx, query, parentID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+	return scanComments(rows)
+}
 
+func scanComments(rows *sql.Rows) ([]*model.CommentResponse, error) {
 	var comments []*model.CommentResponse
 	for rows.Next() {
 		var comment model.CommentResponse
-		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID); err != nil {
+		err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
+		if err != nil {
 			return nil, err
 		}
 		comments = append(comments, &comment)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return comments, nil
+}
+
+func (s *PostgresStorage) GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error) {
+	var comment model.CommentResponse
+	err := s.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
+	if err != nil {
+		return nil, err
+	}
+	return &comment, nil
 }
 
 func (s *PostgresStorage) GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error) {
@@ -273,15 +335,6 @@ func (s *PostgresStorage) GetCommentsByUserID(ctx context.Context, userID string
 		comments = append(comments, &comment)
 	}
 	return comments, nil
-}
-
-func (s *PostgresStorage) GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error) {
-	var comment model.CommentResponse
-	err := s.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
-	if err != nil {
-		return nil, err
-	}
-	return &comment, nil
 }
 
 func (s *PostgresStorage) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {

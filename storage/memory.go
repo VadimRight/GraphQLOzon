@@ -75,25 +75,55 @@ func (s *InMemoryStorage) GetAllUsers(ctx context.Context) ([]*model.User, error
 	return users, nil
 }
 
-func (s *InMemoryStorage) GetPostsByUserID(ctx context.Context, userID string) ([]*model.Post, error) {
+func (s *InMemoryStorage) GetAllPosts(ctx context.Context, limit, offset *int) ([]*model.Post, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
+
+	var posts []*model.Post
+	for _, post := range s.posts {
+		posts = append(posts, post)
+	}
+
+	// Пагинация
+	if limit != nil && offset != nil {
+		start := *offset
+		end := *offset + *limit
+		if start > len(posts) {
+			return []*model.Post{}, nil
+		}
+		if end > len(posts) {
+			end = len(posts)
+		}
+		posts = posts[start:end]
+	}
+
+	return posts, nil
+}
+
+func (s *InMemoryStorage) GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	var posts []*model.Post
 	for _, post := range s.posts {
 		if post.AuthorID == userID {
 			posts = append(posts, post)
 		}
 	}
-	return posts, nil
-}
 
-func (s *InMemoryStorage) GetAllPosts(ctx context.Context) ([]*model.Post, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	posts := make([]*model.Post, 0, len(s.posts))
-	for _, post := range s.posts {
-		posts = append(posts, post)
+	// Пагинация
+	if limit != nil && offset != nil {
+		start := *offset
+		end := *offset + *limit
+		if start > len(posts) {
+			return []*model.Post{}, nil
+		}
+		if end > len(posts) {
+			end = len(posts)
+		}
+		posts = posts[start:end]
 	}
+
 	return posts, nil
 }
 
@@ -125,7 +155,7 @@ func (s *InMemoryStorage) GetAllComments(ctx context.Context, limit, offset *int
 	return comments, nil
 }
 
-func (s *InMemoryStorage) GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error) {
+func (s *InMemoryStorage) GetCommentsByPostID(ctx context.Context, postID string, limit, offset *int) ([]*model.CommentResponse, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	var comments []*model.CommentResponse
@@ -134,10 +164,20 @@ func (s *InMemoryStorage) GetCommentsByPostID(ctx context.Context, postID string
 			comments = append(comments, comment)
 		}
 	}
-	return comments, nil
+
+	start := 0
+	if offset != nil {
+		start = *offset
+	}
+	end := len(comments)
+	if limit != nil && start+*limit < end {
+		end = start + *limit
+	}
+
+	return comments[start:end], nil
 }
 
-func (s *InMemoryStorage) GetCommentsByParentID(ctx context.Context, parentID string) ([]*model.CommentResponse, error) {
+func (s *InMemoryStorage) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	var comments []*model.CommentResponse
@@ -146,7 +186,31 @@ func (s *InMemoryStorage) GetCommentsByParentID(ctx context.Context, parentID st
 			comments = append(comments, comment)
 		}
 	}
+
+	// Применяем лимит и смещение, если они заданы
+	if limit != nil && offset != nil {
+		start := *offset
+		end := start + *limit
+		if start > len(comments) {
+			return []*model.CommentResponse{}, nil
+		}
+		if end > len(comments) {
+			end = len(comments)
+		}
+		return comments[start:end], nil
+	}
+
 	return comments, nil
+}
+
+func (s *InMemoryStorage) GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	comment, exists := s.comments[id]
+	if !exists {
+		return nil, fmt.Errorf("comment not found")
+	}
+	return comment, nil
 }
 
 func (s *InMemoryStorage) GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error) {
@@ -159,16 +223,6 @@ func (s *InMemoryStorage) GetCommentsByUserID(ctx context.Context, userID string
 		}
 	}
 	return comments, nil
-}
-
-func (s *InMemoryStorage) GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	comment, exists := s.comments[id]
-	if !exists {
-		return nil, fmt.Errorf("comment not found")
-	}
-	return comment, nil
 }
 
 func (s *InMemoryStorage) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {

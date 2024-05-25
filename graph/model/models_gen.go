@@ -3,11 +3,11 @@
 package model
 
 type Comment struct {
-	ID       string `json:"id"`
-	Comment  string `json:"comment"`
-	AuthorID string `json:"authorId"`
-	ItemID   string `json:"itemId"`
-	Author   *User  `json:"author"`
+	ID            string `json:"id"`
+	Comment       string `json:"comment"`
+	AuthorID      string `json:"authorId"`
+	ItemID        string `json:"itemId"`
+	AuthorComment *User  `json:"authorComment"`
 }
 
 type CommentResponse struct {
@@ -16,7 +16,7 @@ type CommentResponse struct {
 	AuthorID        string             `json:"authorId"`
 	PostID          string             `json:"postId"`
 	ParentCommentID *string            `json:"parentCommentID,omitempty"`
-	Author          *User              `json:"author"`
+	AuthorComment   *User              `json:"authorComment"`
 	Replies         []*CommentResponse `json:"replies"`
 }
 
@@ -27,7 +27,7 @@ type Post struct {
 	ID          string             `json:"id"`
 	Text        string             `json:"text"`
 	AuthorID    string             `json:"authorId"`
-	Author      *User              `json:"author"`
+	AuthorPost  *User              `json:"authorPost"`
 	Comments    []*CommentResponse `json:"comments"`
 	Commentable bool               `json:"commentable"`
 }
