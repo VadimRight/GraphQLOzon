@@ -117,7 +117,7 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 			}
 
 			// Получаем ответы для каждого комментария
-			comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID)
+			comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, nil, nil)
 			if err != nil {
 				return nil, err
 			}
@@ -162,7 +162,7 @@ func (r *queryResolver) PostsByUserID(ctx context.Context, userID string) ([]*mo
 			}
 
 			// Получаем ответы для каждого комментария
-			comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID)
+			comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, nil, nil)
 			if err != nil {
 				return nil, err
 			}
@@ -206,7 +206,7 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 		}
 
 		// Получаем ответы для каждого комментария
-		comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID)
+		comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, nil, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -229,7 +229,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, text string, permissi
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
-	fmt.Println("Creating comment for user ID:", user.ID)
+	fmt.Println("Creating post for user ID:", user.ID)
 	id := uuid.New().String()
 	post, err := r.PostService.CreatePost(ctx, id, text, user.ID, permissionToComment)
 	if err != nil {
@@ -253,7 +253,7 @@ func (r *queryResolver) Comments(ctx context.Context, limit *int, offset *int) (
 		}
 
 		// Получаем ответы для каждого комментария
-		comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID)
+		comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, nil, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -269,8 +269,7 @@ func (r *queryResolver) Comments(ctx context.Context, limit *int, offset *int) (
 	return comments, nil
 }
 
-// Метод получения комментария по его ID
-func (r *queryResolver) Comment(ctx context.Context, id string) (*model.CommentResponse, error) {
+func (r *queryResolver) Comment(ctx context.Context, id string, limit, offset *int) (*model.CommentResponse, error) {
 	comment, err := r.CommentService.GetCommentByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -282,8 +281,8 @@ func (r *queryResolver) Comment(ctx context.Context, id string) (*model.CommentR
 		return nil, err
 	}
 
-	// Получаем ответы для комментария
-	comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID)
+	// Получаем ответы для комментария с поддержкой пагинации
+	comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -310,5 +309,4 @@ func (r *mutationResolver) CreateComment(ctx context.Context, commentText string
 	if err != nil {
 		return nil, err
 	}
-	return comment, nil
-}
+	return comment, nil }

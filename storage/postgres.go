@@ -239,22 +239,51 @@ func (s *PostgresStorage) GetCommentsByPostID(ctx context.Context, postID string
 	return comments, nil
 }
 
-func (s *PostgresStorage) GetCommentsByParentID(ctx context.Context, parentID string) ([]*model.CommentResponse, error) {
-	rows, err := s.DB.QueryContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE parent_comment_id=$1", parentID)
+func (s *PostgresStorage) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
+	query := "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE parent_comment_id=$1"
+
+	// Добавляем лимит и смещение, если они заданы
+	if limit != nil && offset != nil {
+		query += " LIMIT $2 OFFSET $3"
+		rows, err := s.DB.QueryContext(ctx, query, parentID, *limit, *offset)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+		return scanComments(rows)
+	}
+
+	rows, err := s.DB.QueryContext(ctx, query, parentID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+	return scanComments(rows)
+}
 
+func scanComments(rows *sql.Rows) ([]*model.CommentResponse, error) {
 	var comments []*model.CommentResponse
 	for rows.Next() {
 		var comment model.CommentResponse
-		if err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID); err != nil {
+		err := rows.Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
+		if err != nil {
 			return nil, err
 		}
 		comments = append(comments, &comment)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return comments, nil
+}
+
+func (s *PostgresStorage) GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error) {
+	var comment model.CommentResponse
+	err := s.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
+	if err != nil {
+		return nil, err
+	}
+	return &comment, nil
 }
 
 func (s *PostgresStorage) GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error) {
@@ -273,15 +302,6 @@ func (s *PostgresStorage) GetCommentsByUserID(ctx context.Context, userID string
 		comments = append(comments, &comment)
 	}
 	return comments, nil
-}
-
-func (s *PostgresStorage) GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error) {
-	var comment model.CommentResponse
-	err := s.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
-	if err != nil {
-		return nil, err
-	}
-	return &comment, nil
 }
 
 func (s *PostgresStorage) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {

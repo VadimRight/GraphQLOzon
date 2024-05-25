@@ -1,4 +1,3 @@
-// service/comment_service.go
 package service
 
 import (
@@ -11,7 +10,7 @@ type CommentService interface {
 	GetAllComments(ctx context.Context, limit, offset *int) ([]*model.CommentResponse, error)
 	GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error)
 	GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error)
-	GetCommentsByParentID(ctx context.Context, parentID string) ([]*model.CommentResponse, error)
+	GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error)
 	CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error)
 }
 
@@ -35,8 +34,8 @@ func (s *commentService) GetCommentsByPostID(ctx context.Context, postID string)
 	return s.storage.GetCommentsByPostID(ctx, postID)
 }
 
-func (s *commentService) GetCommentsByParentID(ctx context.Context, parentID string) ([]*model.CommentResponse, error) {
-	return s.storage.GetCommentsByParentID(ctx, parentID)
+func (s *commentService) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
+	return s.storage.GetCommentsByParentID(ctx, parentID, limit, offset)
 }
 
 func (s *commentService) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {

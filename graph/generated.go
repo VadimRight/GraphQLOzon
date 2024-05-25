@@ -82,7 +82,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Comment        func(childComplexity int, id string) int
+		Comment        func(childComplexity int, id string, limit *int, offset *int) int
 		Comments       func(childComplexity int, limit *int, offset *int) int
 		Post           func(childComplexity int, id string) int
 		Posts          func(childComplexity int) int
@@ -119,7 +119,7 @@ type QueryResolver interface {
 	Post(ctx context.Context, id string) (*model.Post, error)
 	PostsByUserID(ctx context.Context, userID string) ([]*model.Post, error)
 	Comments(ctx context.Context, limit *int, offset *int) ([]*model.CommentResponse, error)
-	Comment(ctx context.Context, id string) (*model.CommentResponse, error)
+	Comment(ctx context.Context, id string, limit *int, offset *int) (*model.CommentResponse, error)
 }
 
 type executableSchema struct {
@@ -325,7 +325,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Comment(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.Comment(childComplexity, args["id"].(string), args["limit"].(*int), args["offset"].(*int)), true
 
 	case "Query.comments":
 		if e.complexity.Query.Comments == nil {
@@ -689,6 +689,24 @@ func (ec *executionContext) field_Query_comment_args(ctx context.Context, rawArg
 		}
 	}
 	args["id"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
 	return args, nil
 }
 
@@ -2402,7 +2420,7 @@ func (ec *executionContext) _Query_comment(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Comment(rctx, fc.Args["id"].(string))
+		return ec.resolvers.Query().Comment(rctx, fc.Args["id"].(string), fc.Args["limit"].(*int), fc.Args["offset"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

@@ -137,7 +137,7 @@ func (s *InMemoryStorage) GetCommentsByPostID(ctx context.Context, postID string
 	return comments, nil
 }
 
-func (s *InMemoryStorage) GetCommentsByParentID(ctx context.Context, parentID string) ([]*model.CommentResponse, error) {
+func (s *InMemoryStorage) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	var comments []*model.CommentResponse
@@ -146,7 +146,31 @@ func (s *InMemoryStorage) GetCommentsByParentID(ctx context.Context, parentID st
 			comments = append(comments, comment)
 		}
 	}
+
+	// Применяем лимит и смещение, если они заданы
+	if limit != nil && offset != nil {
+		start := *offset
+		end := start + *limit
+		if start > len(comments) {
+			return []*model.CommentResponse{}, nil
+		}
+		if end > len(comments) {
+			end = len(comments)
+		}
+		return comments[start:end], nil
+	}
+
 	return comments, nil
+}
+
+func (s *InMemoryStorage) GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	comment, exists := s.comments[id]
+	if !exists {
+		return nil, fmt.Errorf("comment not found")
+	}
+	return comment, nil
 }
 
 func (s *InMemoryStorage) GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error) {
@@ -159,16 +183,6 @@ func (s *InMemoryStorage) GetCommentsByUserID(ctx context.Context, userID string
 		}
 	}
 	return comments, nil
-}
-
-func (s *InMemoryStorage) GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	comment, exists := s.comments[id]
-	if !exists {
-		return nil, fmt.Errorf("comment not found")
-	}
-	return comment, nil
 }
 
 func (s *InMemoryStorage) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {
