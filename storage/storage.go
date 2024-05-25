@@ -21,7 +21,7 @@ type Storage interface {
 
 	// Комментарии
 	GetAllComments(ctx context.Context, limit, offset *int) ([]*model.CommentResponse, error)
-	GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error)
+	GetCommentsByPostID(ctx context.Context, postID string, limit, offset *int) ([]*model.CommentResponse, error) // Обновлено
 	GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error)
 	GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error)
 	GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error)

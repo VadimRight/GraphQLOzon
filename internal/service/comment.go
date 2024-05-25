@@ -1,3 +1,4 @@
+// service/comment_service.go
 package service
 
 import (
@@ -9,9 +10,9 @@ import (
 type CommentService interface {
 	GetAllComments(ctx context.Context, limit, offset *int) ([]*model.CommentResponse, error)
 	GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error)
-	GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error)
-	GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error)
 	CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error)
+	GetCommentsByPostID(ctx context.Context, postID string, limit, offset *int) ([]*model.CommentResponse, error) // Обновлено
+	GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error)
 }
 
 type commentService struct {
@@ -30,14 +31,14 @@ func (s *commentService) GetCommentByID(ctx context.Context, id string) (*model.
 	return s.storage.GetCommentByID(ctx, id)
 }
 
-func (s *commentService) GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error) {
-	return s.storage.GetCommentsByPostID(ctx, postID)
+func (s *commentService) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {
+	return s.storage.CreateComment(ctx, commentText, itemId, userID)
+}
+
+func (s *commentService) GetCommentsByPostID(ctx context.Context, postID string, limit, offset *int) ([]*model.CommentResponse, error) {
+	return s.storage.GetCommentsByPostID(ctx, postID, limit, offset) 
 }
 
 func (s *commentService) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
 	return s.storage.GetCommentsByParentID(ctx, parentID, limit, offset)
-}
-
-func (s *commentService) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {
-	return s.storage.CreateComment(ctx, commentText, itemId, userID)
 }

@@ -1,3 +1,4 @@
+// service/user.go
 package service
 
 import (
@@ -13,18 +14,16 @@ type UserService interface {
 	HashPassword(password string) string
 	ComparePassword(hashed string, normal string) error
 	GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error)
-	GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error)
-	GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error)
 	GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error)
 	GetUserByID(ctx context.Context, userID string) (*model.User, error)
 }
 
 type userService struct {
-	storage storage.Storage
+	storage         storage.Storage
+	commentService  CommentService
 }
 
-func NewUserService(storage storage.Storage) UserService {
-	return &userService{storage: storage}
+func NewUserService(storage storage.Storage, commentService CommentService) UserService { return &userService{storage: storage, commentService: commentService}
 }
 
 func (s *userService) GetAllUsers(ctx context.Context) ([]*model.User, error) {
@@ -64,30 +63,12 @@ func (s *userService) GetPostsByUserID(ctx context.Context, userID string, limit
 		return nil, err
 	}
 	for _, post := range posts {
-		post.Comments, err = s.GetCommentsByPostID(ctx, post.ID)
+		post.Comments, err = s.commentService.GetCommentsByPostID(ctx, post.ID, limit, offset) // Используем commentService
 		if err != nil {
 			return nil, err
 		}
 	}
 	return posts, nil
-}
-
-func (s *userService) GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error) {
-	comments, err := s.storage.GetCommentsByPostID(ctx, postID)
-	if err != nil {
-		return nil, err
-	}
-	for _, comment := range comments {
-		comment.Replies, err = s.GetCommentsByParentID(ctx, comment.ID, nil, nil)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return comments, nil
-}
-
-func (s *userService) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
-	return s.storage.GetCommentsByParentID(ctx, parentID, limit, offset)
 }
 
 func (s *userService) GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error) {

@@ -54,7 +54,7 @@ func (r *queryResolver) Users(ctx context.Context, limit, offset *int) ([]*model
 			}
 
 			// Получаем комментарии для поста
-			post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID)
+			post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
 			if err != nil {
 				return nil, err
 			}
@@ -107,7 +107,7 @@ func (r *queryResolver) User(ctx context.Context, id string, limit, offset *int)
 		}
 
 		// Получаем комментарии для поста
-		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID)
+		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
 		if err != nil {
 			return nil, err
 		}
@@ -183,7 +183,7 @@ func (r *queryResolver) Posts(ctx context.Context, limit, offset *int) ([]*model
 		}
 
 		// Получаем комментарии для поста
-		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID)
+		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
 		if err != nil {
 			return nil, err
 		}
@@ -229,7 +229,7 @@ func (r *queryResolver) PostsByUserID(ctx context.Context, userID string, limit,
 		}
 
 		// Получаем комментарии для поста
-		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID)
+		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
 		if err != nil {
 			return nil, err
 		}
@@ -274,7 +274,7 @@ func (r *queryResolver) Post(ctx context.Context, id string, limit, offset *int)
 	}
 
 	// Получаем комментарии для поста
-	post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID)
+	post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
 	if err != nil {
 		return nil, err
 	}

@@ -155,7 +155,7 @@ func (s *InMemoryStorage) GetAllComments(ctx context.Context, limit, offset *int
 	return comments, nil
 }
 
-func (s *InMemoryStorage) GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error) {
+func (s *InMemoryStorage) GetCommentsByPostID(ctx context.Context, postID string, limit, offset *int) ([]*model.CommentResponse, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	var comments []*model.CommentResponse
@@ -164,7 +164,17 @@ func (s *InMemoryStorage) GetCommentsByPostID(ctx context.Context, postID string
 			comments = append(comments, comment)
 		}
 	}
-	return comments, nil
+
+	start := 0
+	if offset != nil {
+		start = *offset
+	}
+	end := len(comments)
+	if limit != nil && start+*limit < end {
+		end = start + *limit
+	}
+
+	return comments[start:end], nil
 }
 
 func (s *InMemoryStorage) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
