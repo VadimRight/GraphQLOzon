@@ -238,11 +238,33 @@ func (r *mutationResolver) CreatePost(ctx context.Context, text string, permissi
 	return post, nil
 }
 
-// Метод получения всех коментариев
+// Метод получения всех комментариев
 func (r *queryResolver) Comments(ctx context.Context, limit *int, offset *int) ([]*model.CommentResponse, error) {
 	comments, err := r.CommentService.GetAllComments(ctx, limit, offset)
 	if err != nil {
 		return nil, err
+	}
+
+	for _, comment := range comments {
+		// Заполняем автора комментария
+		comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Получаем ответы для каждого комментария
+		comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, reply := range comment.Replies {
+			// Заполняем автора ответа
+			reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 	return comments, nil
 }
@@ -253,6 +275,27 @@ func (r *queryResolver) Comment(ctx context.Context, id string) (*model.CommentR
 	if err != nil {
 		return nil, err
 	}
+
+	// Заполняем автора комментария
+	comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Получаем ответы для комментария
+	comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, reply := range comment.Replies {
+		// Заполняем автора ответа
+		reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return comment, nil
 }
 
