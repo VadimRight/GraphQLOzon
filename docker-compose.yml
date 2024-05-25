@@ -20,4 +20,4 @@ services:
     depends_on:
       - postgres
     env_file:
-      - .env-dev
+      - .env-prod
