@@ -14,7 +14,7 @@ services:
     container_name: graphQLServer
     build:
       context: .
-      dockerfile: docker/api/Dockerfile
+      dockerfile: ./Dockerfile
     ports:
       - 8000:8000
     depends_on:
