@@ -37,8 +37,8 @@ type CommentResponse {
 
 type Query {
   userByUsername(username: String!): User!
-  users: [User!]!
-  user(id: ID!): User
+  users(limit: Int, offset: Int): [User!]!
+  user(id: ID!, limit: Int, offset: Int): User
   posts(limit: Int, offset: Int): [Post!]!
   post(id: ID!, limit: Int, offset: Int): Post
   postsByUserID(userID: ID!, limit: Int, offset: Int): [Post!]! 
