@@ -42,6 +42,7 @@ type Query {
   user(id: ID!): User
   posts: [Post!]!
   post(id: ID!): Post
+  postsByUserID(userID: ID!): [Post!]! 
   comments(limit: Int, offset: Int): [CommentResponse!]!
   comment(id: ID!): CommentResponse
 }
