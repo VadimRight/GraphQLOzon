@@ -5,20 +5,23 @@ import (
 	"fmt"
 	"log"
 	_ "github.com/lib/pq"
+	"github.com/VadimRight/GraphQLOzon/bootstrap"
 )
 
 // Тип базы данных
-type Storage struct {
+type PostgresStorage struct {
 	DB *sql.DB
 }
 
 
 // Все SQL запросы и функции работы с базой данных храняться в файле graph/resolver.go, а также вспомогательные запросы для обеспечения функционала схемы и резольвера храняться в сервисе пользователей в internal/service/user.go
 
-
+func NewPostgresStorage(db *sql.DB) *PostgresStorage {
+    return &PostgresStorage{DB: db}
+}
 
 // Функция инициализации базы данных и подключение к базе данных
-func InitPostgresDatabase(cfg *Config) *Storage  {
+func InitPostgresDatabase(cfg *bootstrap.Config) *PostgresStorage  {
 	const op = "postgres.InitPostgresDatabase"
 
 	dbHost := cfg.Postgres.PostgresHost
@@ -74,10 +77,10 @@ func InitPostgresDatabase(cfg *Config) *Storage  {
 	_, err = createCommentTable.Exec()
 	if err != nil {	log.Fatalf("%s: %v", op, err) }
 
-	return &Storage{DB: db}
+	return &PostgresStorage{DB: db}
 }
 
 // Функция закрытия соединения с базой данных
-func CloseDB(db *Storage) error {
+func CloseDB(db *PostgresStorage) error {
 	return db.DB.Close()
 }
