@@ -95,6 +95,21 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	for _, post := range posts {
+		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, comment := range post.Comments {
+			comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	return posts, nil
 }
 
