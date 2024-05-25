@@ -14,6 +14,7 @@ import (
 
 // Функция инициализации сервера
 func InitServer(cfg *bootstrap.Config, storage storage.Storage) {	
+	gin.SetMode(cfg.Server.RunMode)
 	r := gin.Default()
 	r.Use(middleware.AuthMiddleware())
 	r.POST("/graphql", graphqlHandler(storage))
