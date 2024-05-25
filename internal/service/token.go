@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 	"github.com/dgrijalva/jwt-go"
+	"errors"
 )
 
 // Структура токенов Bearer, используемыз в данном приложении
@@ -52,4 +53,24 @@ func JwtValidate(ctx context.Context, token string) (*jwt.Token, error) {
 		}
 		return jwtSecret, nil
 	})
+}
+
+// ParseToken парсит JWT токен и возвращает его claims
+func ParseToken(tokenString string) (jwt.MapClaims, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Ваша логика для проверки подписи токена
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
+		return []byte("secret"), nil // Ваш секретный ключ
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims, nil
+	} else {
+		return nil, errors.New("invalid token")
+	}
 }
