@@ -1,4 +1,3 @@
-// service/user.go
 package service
 
 import (
@@ -13,7 +12,7 @@ type UserService interface {
 	UserCreate(ctx context.Context, username string, password string) (*model.User, error)
 	HashPassword(password string) string
 	ComparePassword(hashed string, normal string) error
-	GetPostsByUserID(ctx context.Context, userID string) ([]*model.Post, error)
+	GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error)
 	GetCommentsByPostID(ctx context.Context, postID string) ([]*model.CommentResponse, error)
 	GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error)
 	GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error)
@@ -46,7 +45,7 @@ func (s *userService) GetUserByID(ctx context.Context, userID string) (*model.Us
 		return nil, err
 	}
 
-	user.Posts, err = s.GetPostsByUserID(ctx, user.ID)
+	user.Posts, err = s.GetPostsByUserID(ctx, user.ID, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -59,8 +58,8 @@ func (s *userService) GetUserByID(ctx context.Context, userID string) (*model.Us
 	return user, nil
 }
 
-func (s *userService) GetPostsByUserID(ctx context.Context, userID string) ([]*model.Post, error) {
-	posts, err := s.storage.GetPostsByUserID(ctx, userID)
+func (s *userService) GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error) {
+	posts, err := s.storage.GetPostsByUserID(ctx, userID, limit, offset)
 	if err != nil {
 		return nil, err
 	}

@@ -136,8 +136,18 @@ func (s *PostgresStorage) GetAllUsers(ctx context.Context) ([]*model.User, error
 	return users, nil
 }
 
-func (s *PostgresStorage) GetPostsByUserID(ctx context.Context, userID string) ([]*model.Post, error) {
-	rows, err := s.DB.QueryContext(ctx, "SELECT id, text, author_id, commentable FROM post WHERE author_id=$1", userID)
+func (s *PostgresStorage) GetAllPosts(ctx context.Context, limit, offset *int) ([]*model.Post, error) {
+	query := "SELECT id, text, author_id, commentable FROM posts"
+	var rows *sql.Rows
+	var err error
+
+	if limit != nil && offset != nil {
+		query += " LIMIT $1 OFFSET $2"
+		rows, err = s.DB.QueryContext(ctx, query, *limit, *offset)
+	} else {
+		rows, err = s.DB.QueryContext(ctx, query)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -154,8 +164,18 @@ func (s *PostgresStorage) GetPostsByUserID(ctx context.Context, userID string) (
 	return posts, nil
 }
 
-func (s *PostgresStorage) GetAllPosts(ctx context.Context) ([]*model.Post, error) {
-	rows, err := s.DB.QueryContext(ctx, "SELECT id, text, author_id, commentable FROM post")
+func (s *PostgresStorage) GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error) {
+	query := "SELECT id, text, author_id, commentable FROM posts WHERE author_id = $1"
+	var rows *sql.Rows
+	var err error
+
+	if limit != nil && offset != nil {
+		query += " LIMIT $2 OFFSET $3"
+		rows, err = s.DB.QueryContext(ctx, query, userID, *limit, *offset)
+	} else {
+		rows, err = s.DB.QueryContext(ctx, query, userID)
+	}
+
 	if err != nil {
 		return nil, err
 	}

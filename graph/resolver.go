@@ -90,8 +90,8 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, username string, pa
 }
 
 // Метод получения всех постов
-func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
-	posts, err := r.PostService.GetAllPosts(ctx)
+func (r *queryResolver) Posts(ctx context.Context, limit, offset *int) ([]*model.Post, error) {
+	posts, err := r.PostService.GetAllPosts(ctx, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -134,9 +134,8 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 	return posts, nil
 }
 
-// Метод получения постов по ID пользователя
-func (r *queryResolver) PostsByUserID(ctx context.Context, userID string) ([]*model.Post, error) {
-	posts, err := r.PostService.GetPostsByUserID(ctx, userID)
+func (r *queryResolver) PostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error) {
+	posts, err := r.PostService.GetPostsByUserID(ctx, userID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -180,47 +179,48 @@ func (r *queryResolver) PostsByUserID(ctx context.Context, userID string) ([]*mo
 }
 
 // Метод получения поста по его ID
-func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
-	post, err := r.PostService.GetPostByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
+// Метод получения поста по его ID с пагинацией
+func (r *queryResolver) Post(ctx context.Context, id string, limit, offset *int) (*model.Post, error) {
+    post, err := r.PostService.GetPostByID(ctx, id)
+    if err != nil {
+        return nil, err
+    }
 
-	// Заполняем автора поста
-	post.AuthorPost, err = r.UserService.GetUserByID(ctx, post.AuthorID)
-	if err != nil {
-		return nil, err
-	}
+    // Заполняем автора поста
+    post.AuthorPost, err = r.UserService.GetUserByID(ctx, post.AuthorID)
+    if err != nil {
+        return nil, err
+    }
 
-	// Получаем комментарии для поста
-	post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID)
-	if err != nil {
-		return nil, err
-	}
+    // Получаем комментарии для поста с поддержкой пагинации
+    post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID)
+    if err != nil {
+        return nil, err
+    }
 
-	for _, comment := range post.Comments {
-		// Заполняем автора комментария
-		comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
-		if err != nil {
-			return nil, err
-		}
+    for _, comment := range post.Comments {
+        // Заполняем автора комментария
+        comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+        if err != nil {
+            return nil, err
+        }
 
-		// Получаем ответы для каждого комментария
-		comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, nil, nil)
-		if err != nil {
-			return nil, err
-		}
+        // Получаем ответы для каждого комментария с поддержкой пагинации
+        comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
+        if err != nil {
+            return nil, err
+        }
 
-		for _, reply := range comment.Replies {
-			// Заполняем автора ответа
-			reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
+        for _, reply := range comment.Replies {
+            // Заполняем автора ответа
+            reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+            if err != nil {
+                return nil, err
+            }
+        }
+    }
 
-	return post, nil
+    return post, nil
 }
 
 // Метод создания поста

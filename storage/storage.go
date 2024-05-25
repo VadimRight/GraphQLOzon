@@ -1,4 +1,3 @@
-// storage/storage.go
 package storage
 
 import (
@@ -15,8 +14,8 @@ type Storage interface {
 	GetAllUsers(ctx context.Context) ([]*model.User, error)
 
 	// Посты
-	GetPostsByUserID(ctx context.Context, userID string) ([]*model.Post, error)
-	GetAllPosts(ctx context.Context) ([]*model.Post, error)
+	GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error)
+	GetAllPosts(ctx context.Context, limit, offset *int) ([]*model.Post, error)
 	GetPostByID(ctx context.Context, postID string) (*model.Post, error)
 	CreatePost(ctx context.Context, id, text, authorID string, commentable bool) (*model.Post, error)
 

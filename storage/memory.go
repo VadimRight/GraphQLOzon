@@ -75,25 +75,55 @@ func (s *InMemoryStorage) GetAllUsers(ctx context.Context) ([]*model.User, error
 	return users, nil
 }
 
-func (s *InMemoryStorage) GetPostsByUserID(ctx context.Context, userID string) ([]*model.Post, error) {
+func (s *InMemoryStorage) GetAllPosts(ctx context.Context, limit, offset *int) ([]*model.Post, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
+
+	var posts []*model.Post
+	for _, post := range s.posts {
+		posts = append(posts, post)
+	}
+
+	// Пагинация
+	if limit != nil && offset != nil {
+		start := *offset
+		end := *offset + *limit
+		if start > len(posts) {
+			return []*model.Post{}, nil
+		}
+		if end > len(posts) {
+			end = len(posts)
+		}
+		posts = posts[start:end]
+	}
+
+	return posts, nil
+}
+
+func (s *InMemoryStorage) GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	var posts []*model.Post
 	for _, post := range s.posts {
 		if post.AuthorID == userID {
 			posts = append(posts, post)
 		}
 	}
-	return posts, nil
-}
 
-func (s *InMemoryStorage) GetAllPosts(ctx context.Context) ([]*model.Post, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	posts := make([]*model.Post, 0, len(s.posts))
-	for _, post := range s.posts {
-		posts = append(posts, post)
+	// Пагинация
+	if limit != nil && offset != nil {
+		start := *offset
+		end := *offset + *limit
+		if start > len(posts) {
+			return []*model.Post{}, nil
+		}
+		if end > len(posts) {
+			end = len(posts)
+		}
+		posts = posts[start:end]
 	}
+
 	return posts, nil
 }
 
