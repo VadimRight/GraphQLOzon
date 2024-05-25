@@ -2,7 +2,7 @@ package storage
 
 import (
 	"database/sql"
-	"github.com/lib/pq"
+	_ "github.com/lib/pq"
 	"github.com/VadimRight/GraphQLOzon/graph/model"
 	"context"
 	"github.com/google/uuid"

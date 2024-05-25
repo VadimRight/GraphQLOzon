@@ -14,6 +14,7 @@ import (
 type Resolver struct{
 	UserService service.UserService
 	CommentService service.CommentService
+	PostService service.PostService
 }
 
 // Функция возвращающая тип Запросов нашего резольвера
@@ -89,7 +90,7 @@ func (r *mutationResolver) RegisterUser(ctx context.Context, username string, pa
 
 // Метод получения всех постов
 func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
-	posts, err := r.UserService.GetAllPosts(ctx)
+	posts, err := r.PostService.GetAllPosts(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +99,7 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 
 // Метод получения поста по его ID
 func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
-	post, err := r.UserService.GetPostByID(ctx, id)
+	post, err := r.PostService.GetPostByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +113,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, text string, permissi
 		return nil, errors.New("unauthorized")
 	}
 	id := uuid.New().String()
-	post, err := r.UserService.CreatePost(ctx, id, text, user.ID, permissionToComment)
+	post, err := r.PostService.CreatePost(ctx, id, text, user.ID, permissionToComment)
 	if err != nil {
 		return nil, err
 	}

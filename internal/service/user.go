@@ -8,6 +8,7 @@ import (
 )
 
 type UserService interface {
+	GetAllUsers(ctx context.Context) ([]*model.User, error) // Новый метод
     	GetUserByUsername(ctx context.Context, username string) (*model.User, error)
     	UserCreate(ctx context.Context, username string, password string) (*model.User, error)
     	HashPassword(password string) string
@@ -25,6 +26,10 @@ type userService struct {
 
 func NewUserService(storage storage.Storage) UserService {
     	return &userService{storage: storage}
+}
+
+func (s *userService) GetAllUsers(ctx context.Context) ([]*model.User, error) {
+	return s.storage.GetAllUsers(ctx)
 }
 
 func (s *userService) GetUserByUsername(ctx context.Context, username string) (*model.User, error) {

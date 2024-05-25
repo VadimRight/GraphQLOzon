@@ -26,7 +26,9 @@ func InitServer(cfg *bootstrap.Config, storage *storage.PostgresStorage) {
 // Хэндлер для непосредственно нашей схемы GraphQL
 func graphqlHandler(storage *storage.PostgresStorage) gin.HandlerFunc {
 	userService := service.NewUserService(storage)
-	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{UserService: userService, DB: storage.DB}}))
+	postService := service.NewPostService(storage)
+	commentService := service.NewCommentService(storage)
+	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{UserService: userService, PostService: postService, CommentService: commentService}}))
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
