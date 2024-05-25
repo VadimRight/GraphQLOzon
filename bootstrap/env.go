@@ -12,6 +12,12 @@ type Config struct {
 	Env *EnvConfig
 	Postgres *PostgresConfig
 	Server *ServerConfig
+	Storage *StorageTypeConfig 
+}
+
+// Тип конифурации 
+type StorageTypeConfig struct {
+	StorageType string
 }
 
 // Тип конфигурации пути до .env и его типа (local или docker)
@@ -44,14 +50,17 @@ func LoadConfig() *Config {
 	envConfig := loadEnvConfig()
 	postgresConfig := loadPostgresConfig()
 	serverConfig := loadServerConfig()	
+	storageTypeConfig := loadStorageTypeConfig()
 	log := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
 	log.Printf("Server Port: %s", serverConfig.ServerPort)
 	log.Printf("Postgres Port: %s", postgresConfig.PostgresPort)
 	log.Printf("Env var: %s", envConfig.Env)
+	log.Printf("StorageType: %s", storageTypeConfig.StorageType)
 	return &Config {
 		Env: envConfig,
 		Postgres: postgresConfig,
 		Server: serverConfig,
+		Storage: storageTypeConfig,
 	}	
 }
 
@@ -155,4 +164,17 @@ func loadServerConfig() *ServerConfig {
 		Timeout: timeoutTime, 
 		IdleTimeout: idleTimeoutTime, 	
 	}
+}
+
+func loadStorageTypeConfig() *StorageTypeConfig {
+	err := godotenv.Load()
+	const opt = "internal.config.loadStorageTypeConfig"
+	if err != nil {
+		log.Fatalf("%s: %v", opt, err)
+	}
+	log := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
+	
+	storageType, ok := os.LookupEnv("STORAGE_TYPE")
+	if !ok {log.Fatal("Can't read STORAGE_TYPE")}
+	return &StorageTypeConfig{ StorageType:  storageType}
 }
