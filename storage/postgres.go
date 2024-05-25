@@ -137,7 +137,7 @@ func (s *PostgresStorage) GetAllUsers(ctx context.Context) ([]*model.User, error
 }
 
 func (s *PostgresStorage) GetAllPosts(ctx context.Context, limit, offset *int) ([]*model.Post, error) {
-	query := "SELECT id, text, author_id, commentable FROM posts"
+	query := "SELECT id, text, author_id, commentable FROM post"
 	var rows *sql.Rows
 	var err error
 
@@ -165,7 +165,7 @@ func (s *PostgresStorage) GetAllPosts(ctx context.Context, limit, offset *int) (
 }
 
 func (s *PostgresStorage) GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error) {
-	query := "SELECT id, text, author_id, commentable FROM posts WHERE author_id = $1"
+	query := "SELECT id, text, author_id, commentable FROM post WHERE author_id = $1"
 	var rows *sql.Rows
 	var err error
 
