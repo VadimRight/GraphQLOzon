@@ -4,6 +4,8 @@ package storage
 import (
 	"context"
 	"github.com/VadimRight/GraphQLOzon/graph/model"
+	"flag"
+	"github.com/VadimRight/GraphQLOzon/bootstrap"
 )
 
 type Storage interface {
@@ -26,4 +28,16 @@ type Storage interface {
 	GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error)
 	GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error)
 	CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error)
+}
+
+func StorageType(cfg *bootstrap.Config) Storage {
+	storageType := flag.String("storage", "postgres", "Type of storage to use: postgres or memory")
+	flag.Parse()
+	var storage Storage
+	if *storageType == "memory" {
+		storage = InitInMemoryStorage()
+	} else {
+		storage = InitPostgresDatabase(cfg)
+	}
+	return storage
 }

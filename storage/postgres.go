@@ -86,10 +86,10 @@ func InitPostgresDatabase(cfg *bootstrap.Config) *PostgresStorage  {
 }
 
 // Функция закрытия соединения с базой данных
-func (s * PostgresStorage) ClosePostgres(db *PostgresStorage) error {
-	return db.DB.Close()
-}
 
+func (s *PostgresStorage) ClosePostgres() error {
+	return s.DB.Close()
+}
 // Реализация методов интерфейса Storage для PostgreSQL
 func (s *PostgresStorage) GetUserByUsername(ctx context.Context, username string) (*model.User, error) {
 	var user model.User

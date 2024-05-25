@@ -8,6 +8,7 @@ import (
 	"github.com/VadimRight/GraphQLOzon/internal/middleware"
 	"github.com/VadimRight/GraphQLOzon/internal/service"
 	"github.com/google/uuid"
+	"fmt"
 )
 
 // Тип Resolver, который ответственен за работу с данными в нашей схеме GraphQL
@@ -112,6 +113,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, text string, permissi
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
+	fmt.Println("Creating comment for user ID:", user.ID)
 	id := uuid.New().String()
 	post, err := r.PostService.CreatePost(ctx, id, text, user.ID, permissionToComment)
 	if err != nil {
@@ -144,6 +146,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, commentText string
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
+	fmt.Println("Creating comment for user ID:", user.ID)
 	comment, err := r.CommentService.CreateComment(ctx, commentText, itemId, user.ID)
 	if err != nil {
 		return nil, err
