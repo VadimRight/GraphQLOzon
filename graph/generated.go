@@ -88,7 +88,7 @@ type ComplexityRoot struct {
 		Posts          func(childComplexity int, limit *int, offset *int) int
 		PostsByUserID  func(childComplexity int, userID string, limit *int, offset *int) int
 		User           func(childComplexity int, id string, limit *int, offset *int) int
-		UserByUsername func(childComplexity int, username string) int
+		UserByUsername func(childComplexity int, username string, limit *int, offset *int) int
 		Users          func(childComplexity int, limit *int, offset *int) int
 	}
 
@@ -112,7 +112,7 @@ type MutationResolver interface {
 	CreateComment(ctx context.Context, comment string, itemID string) (*model.CommentResponse, error)
 }
 type QueryResolver interface {
-	UserByUsername(ctx context.Context, username string) (*model.User, error)
+	UserByUsername(ctx context.Context, username string, limit *int, offset *int) (*model.User, error)
 	Users(ctx context.Context, limit *int, offset *int) ([]*model.User, error)
 	User(ctx context.Context, id string, limit *int, offset *int) (*model.User, error)
 	Posts(ctx context.Context, limit *int, offset *int) ([]*model.Post, error)
@@ -397,7 +397,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.UserByUsername(childComplexity, args["username"].(string)), true
+		return e.complexity.Query.UserByUsername(childComplexity, args["username"].(string), args["limit"].(*int), args["offset"].(*int)), true
 
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
@@ -846,6 +846,24 @@ func (ec *executionContext) field_Query_userByUsername_args(ctx context.Context,
 		}
 	}
 	args["username"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
 	return args, nil
 }
 
@@ -2081,7 +2099,7 @@ func (ec *executionContext) _Query_userByUsername(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().UserByUsername(rctx, fc.Args["username"].(string))
+		return ec.resolvers.Query().UserByUsername(rctx, fc.Args["username"].(string), fc.Args["limit"].(*int), fc.Args["offset"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

@@ -137,14 +137,14 @@ func (r *queryResolver) User(ctx context.Context, id string, limit, offset *int)
 	return user, nil
 }
 
-func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*model.User, error) {
+func (r *queryResolver) UserByUsername(ctx context.Context, username string, limit, offset *int) (*model.User, error) {
 	user, err := r.UserService.GetUserByUsername(ctx, username)
 	if err != nil {
 		return nil, err
 	}
 
-	// Получение постов пользователя
-	user.Posts, err = r.PostService.GetPostsByUserID(ctx, user.ID, nil, nil)
+	// Получение постов пользователя с учетом пагинации
+	user.Posts, err = r.PostService.GetPostsByUserID(ctx, user.ID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -156,8 +156,8 @@ func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*m
 			return nil, err
 		}
 
-		// Получение комментариев для поста
-		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, nil, nil)
+		// Получение комментариев для поста с учетом пагинации
+		post.Comments, err = r.CommentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
 		if err != nil {
 			return nil, err
 		}
@@ -169,8 +169,8 @@ func (r *queryResolver) UserByUsername(ctx context.Context, username string) (*m
 				return nil, err
 			}
 
-			// Получение ответов для каждого комментария
-			comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, nil, nil)
+			// Получение ответов для каждого комментария с учетом пагинации
+			comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
 			if err != nil {
 				return nil, err
 			}
