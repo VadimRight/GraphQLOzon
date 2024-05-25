@@ -9,7 +9,7 @@ services:
     expose: 
       - 5432
     env_file:
-      - .env-dev
+      - .env-prod
   app:
     container_name: graphQLServer
     build:
@@ -20,4 +20,4 @@ services:
     depends_on:
       - postgres
     env_file:
-      - .env-dev
+      - .env-prod

@@ -4,7 +4,6 @@ package storage
 import (
 	"context"
 	"github.com/VadimRight/GraphQLOzon/graph/model"
-	"flag"
 	"github.com/VadimRight/GraphQLOzon/bootstrap"
 )
 
@@ -31,11 +30,9 @@ type Storage interface {
 }
 
 func StorageType(cfg *bootstrap.Config) Storage {
-	storageType := flag.String("storage", "postgres", "Type of storage to use: postgres or memory")
-	flag.Parse()
+	storageType := cfg.Storage.StorageType 
 	var storage Storage
-	// Если флаг --memory, то данные храняться в оперативной памяти, если флага нет или это postgres, то данные храняться в базе данных Postgres
-	if *storageType == "memory" {
+	if storageType == "memory" {
 		storage = InitInMemoryStorage()
 	} else {
 		storage = InitPostgresDatabase(cfg)
