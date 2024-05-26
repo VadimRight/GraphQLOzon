@@ -1,118 +1,81 @@
+// resolver_comment_test.go
 package graph
 
 import (
 	"context"
 	"testing"
-
-	"github.com/VadimRight/GraphQLOzon/graph/model"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"github.com/VadimRight/GraphQLOzon/model"
+	"github.com/VadimRight/GraphQLOzon/internal/usecase"
+	"github.com/VadimRight/GraphQLOzon/internal/middleware"
 )
 
-// MockCommentService is a mock implementation of the CommentService interface
-type MockCommentService struct {
-	mock.Mock
-}
-
-func (m *MockCommentService) GetAllComments(ctx context.Context, limit, offset *int) ([]*model.CommentResponse, error) {
-	args := m.Called(ctx, limit, offset)
-	return args.Get(0).([]*model.CommentResponse), args.Error(1)
-}
-
-func (m *MockCommentService) GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error) {
-	args := m.Called(ctx, id)
-	return args.Get(0).(*model.CommentResponse), args.Error(1)
-}
-
-func (m *MockCommentService) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
-	args := m.Called(ctx, parentID, limit, offset)
-	return args.Get(0).([]*model.CommentResponse), args.Error(1)
-}
-
-func (m *MockCommentService) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {
-	args := m.Called(ctx, commentText, itemId, userID)
-	return args.Get(0).(*model.CommentResponse), args.Error(1)
-}
-
-// Tests for CommentService methods
-
 func TestComments(t *testing.T) {
-	mockCommentService := new(MockCommentService)
-	mockUserService := new(MockUserService)
-	resolver := &Resolver{
-		CommentService: mockCommentService,
-		UserService:    mockUserService,
-	}
+	mockCommentUsecase := new(usecase.MockCommentUsecase)
+	mockUserUsecase := new(usecase.MockUserUsecase)
+	resolver := &queryResolver{&Resolver{CommentUsecase: mockCommentUsecase, UserUsecase: mockUserUsecase}}
 
-	expectedComments := []*model.CommentResponse{
-		{ID: "1", Comment: "Test comment 1", AuthorID: "user1"},
-		{ID: "2", Comment: "Test comment 2", AuthorID: "user2"},
-	}
-
-	mockCommentService.On("GetAllComments", mock.Anything, mock.Anything, mock.Anything).Return(expectedComments, nil)
-	mockUserService.On("GetUserByID", mock.Anything, "user1").Return(&model.User{ID: "user1", Username: "user1"}, nil)
-	mockUserService.On("GetUserByID", mock.Anything, "user2").Return(&model.User{ID: "user2", Username: "user2"}, nil)
-	mockCommentService.On("GetCommentsByParentID", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]*model.CommentResponse{}, nil)
-
+	ctx := context.Background()
 	limit := 10
 	offset := 0
-	comments, err := resolver.Query().Comments(context.Background(), &limit, &offset)
+
+	expectedComments := []*model.CommentResponse{
+		{ID: "1", Comment: "Test comment", AuthorID: "1"},
+	}
+
+	mockCommentUsecase.On("GetAllComments", ctx, &limit, &offset).Return(expectedComments, nil)
+	mockUserUsecase.On("GetUserByID", ctx, "2").Return(&model.User{ID: "1", Username: "user1"}, nil)
+	mockCommentUsecase.On("GetCommentsByParentID", ctx, "1", &limit, &offset).Return([]*model.CommentResponse{}, nil)
+
+	comments, err := resolver.Comments(ctx, &limit, &offset)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedComments, comments)
-	mockCommentService.AssertExpectations(t)
-	mockUserService.AssertExpectations(t)
+	mockCommentUsecase.AssertExpectations(t)
+	mockUserUsecase.AssertExpectations(t)
 }
 
 func TestComment(t *testing.T) {
-	mockCommentService := new(MockCommentService)
-	mockUserService := new(MockUserService)
-	resolver := &Resolver{
-		CommentService: mockCommentService,
-		UserService:    mockUserService,
-	}
+	mockCommentUsecase := new(usecase.MockCommentUsecase)
+	mockUserUsecase := new(usecase.MockUserUsecase)
+	resolver := &queryResolver{&Resolver{CommentUsecase: mockCommentUsecase, UserUsecase: mockUserUsecase}}
 
 	ctx := context.Background()
-	commentID := "1"
-
-	expectedComment := &model.CommentResponse{ID: commentID, Comment: "Test comment", AuthorID: "user1"}
-
-	mockCommentService.On("GetCommentByID", ctx, commentID).Return(expectedComment, nil)
-	mockUserService.On("GetUserByID", ctx, "user1").Return(&model.User{ID: "user1", Username: "user1"}, nil)
-	mockCommentService.On("GetCommentsByParentID", ctx, commentID, mock.Anything, mock.Anything).Return([]*model.CommentResponse{}, nil)
-
+	id := "1"
 	limit := 10
 	offset := 0
-	comment, err := resolver.Query().Comment(ctx, commentID, &limit, &offset)
+
+	expectedComment := &model.CommentResponse{ID: "1", Comment: "Test comment", AuthorID: "1"}
+
+	mockCommentUsecase.On("GetCommentByID", ctx, id).Return(expectedComment, nil)
+	mockUserUsecase.On("GetUserByID", ctx, "1").Return(&model.User{ID: "1", Username: "user1"}, nil)
+	mockCommentUsecase.On("GetCommentsByParentID", ctx, "1", &limit, &offset).Return([]*model.CommentResponse{}, nil)
+
+	comment, err := resolver.Comment(ctx, id, &limit, &offset)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedComment, comment)
-	mockCommentService.AssertExpectations(t)
-	mockUserService.AssertExpectations(t)
+	mockCommentUsecase.AssertExpectations(t)
+	mockUserUsecase.AssertExpectations(t)
 }
 
 func TestCreateComment(t *testing.T) {
-	mockCommentService := new(MockCommentService)
-	mockUserService := new(MockUserService)
-	resolver := &Resolver{
-		CommentService: mockCommentService,
-		UserService:    mockUserService,
-	}
+	mockCommentUsecase := new(usecase.MockCommentUsecase)
+	mockUserUsecase := new(usecase.MockUserUsecase)
+	resolver := &mutationResolver{&Resolver{CommentUsecase: mockCommentUsecase, UserUsecase: mockUserUsecase}}
 
 	ctx := context.Background()
 	commentText := "New comment"
-	itemID := "post1"
-	userID := "user1"
+	itemId := "1"
+	userID := "1"
 
-	expectedComment := &model.CommentResponse{ID: "1", Comment: commentText, AuthorID: userID}
+	expectedComment := &model.CommentResponse{ID: "1", Comment: "New comment", AuthorID: userID, PostID: itemId}
 
-	mockCommentService.On("CreateComment", ctx, commentText, itemID, userID).Return(expectedComment, nil)
-	mockUserService.On("GetUserByID", ctx, userID).Return(&model.User{ID: userID, Username: "user1"}, nil)
+	mockCommentUsecase.On("CreateComment", ctx, commentText, itemId, userID).Return(expectedComment, nil)
 
-	comment, err := resolver.Mutation().CreateComment(ctx, commentText, itemID)
+	comment, err := resolver.CreateComment(ctx, commentText, itemId)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedComment, comment)
-	mockCommentService.AssertExpectations(t)
-	mockUserService.AssertExpectations(t)
+	mockCommentUsecase.AssertExpectations(t)
 }
