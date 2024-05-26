@@ -9,27 +9,27 @@ import (
 
 // Метод получения всех комментариев
 func (r *queryResolver) Comments(ctx context.Context, limit, offset *int) ([]*model.CommentResponse, error) {
-	comments, err := r.CommentService.GetAllComments(ctx, limit, offset)
+	comments, err := r.CommentUsecase.GetAllComments(ctx, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, comment := range comments {
 		// Заполняем автора комментария
-		comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+		comment.AuthorComment, err = r.UserUsecase.GetUserByID(ctx, comment.AuthorID)
 		if err != nil {
 			return nil, err
 		}
 
 		// Получаем ответы для каждого комментария
-		comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
+		comment.Replies, err = r.CommentUsecase.GetCommentsByParentID(ctx, comment.ID, limit, offset)
 		if err != nil {
 			return nil, err
 		}
 
 		for _, reply := range comment.Replies {
 			// Заполняем автора ответа
-			reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+			reply.AuthorComment, err = r.UserUsecase.GetUserByID(ctx, reply.AuthorID)
 			if err != nil {
 				return nil, err
 			}
@@ -41,26 +41,26 @@ func (r *queryResolver) Comments(ctx context.Context, limit, offset *int) ([]*mo
 
 // Метод получения комментария по его ID
 func (r *queryResolver) Comment(ctx context.Context, id string, limit, offset *int) (*model.CommentResponse, error) {
-	comment, err := r.CommentService.GetCommentByID(ctx, id)
+	comment, err := r.CommentUsecase.GetCommentByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
 	// Заполняем автора комментария
-	comment.AuthorComment, err = r.UserService.GetUserByID(ctx, comment.AuthorID)
+	comment.AuthorComment, err = r.UserUsecase.GetUserByID(ctx, comment.AuthorID)
 	if err != nil {
 		return nil, err
 	}
 
 	// Получаем ответы для комментария с поддержкой пагинации
-	comment.Replies, err = r.CommentService.GetCommentsByParentID(ctx, comment.ID, limit, offset)
+	comment.Replies, err = r.CommentUsecase.GetCommentsByParentID(ctx, comment.ID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, reply := range comment.Replies {
 		// Заполняем автора ответа
-		reply.AuthorComment, err = r.UserService.GetUserByID(ctx, reply.AuthorID)
+		reply.AuthorComment, err = r.UserUsecase.GetUserByID(ctx, reply.AuthorID)
 		if err != nil {
 			return nil, err
 		}
@@ -75,7 +75,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, commentText string
 	if user == nil {
 		return nil, errors.New("unauthorized")
 	}
-	comment, err := r.CommentService.CreateComment(ctx, commentText, itemId, user.ID)
+	comment, err := r.CommentUsecase.CreateComment(ctx, commentText, itemId, user.ID)
 	if err != nil {
 		return nil, err
 	}
