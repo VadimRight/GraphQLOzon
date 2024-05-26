@@ -2,7 +2,7 @@ package graph
 
 import (
 	"context"
-	"github.com/VadimRight/GraphQLOzon/graph/model"
+	"github.com/VadimRight/GraphQLOzon/model"
 	"errors"
 )
 

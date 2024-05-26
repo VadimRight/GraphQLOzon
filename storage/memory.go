@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"github.com/VadimRight/GraphQLOzon/graph/model"
+	"github.com/VadimRight/GraphQLOzon/model"
 	"github.com/google/uuid"
 	"errors"
 )
