@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 	"github.com/VadimRight/GraphQLOzon/graph/model"
-	"github.com/VadimRight/GraphQLOzon/bootstrap"
+	"github.com/VadimRight/GraphQLOzon/internal/config"
 )
 
 type Storage interface {
@@ -28,7 +28,7 @@ type Storage interface {
 	CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error)
 }
 
-func StorageType(cfg *bootstrap.Config) Storage {
+func StorageType(cfg *config.Config) Storage {
 	storageType := cfg.Storage.StorageType
 	var storage Storage
 	if storageType == "memory" {

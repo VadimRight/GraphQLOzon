@@ -6,7 +6,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/VadimRight/GraphQLOzon/graph"
 	"github.com/VadimRight/GraphQLOzon/storage"
-	"github.com/VadimRight/GraphQLOzon/bootstrap"
+	"github.com/VadimRight/GraphQLOzon/internal/config"
 	"log"
 	"github.com/VadimRight/GraphQLOzon/internal/service"
 	"github.com/VadimRight/GraphQLOzon/internal/middleware"
@@ -14,7 +14,7 @@ import (
 )
 
 // Функция инициализации сервера
-func InitServer(cfg *bootstrap.Config, storage storage.Storage) {
+func InitServer(cfg *config.Config, storage storage.Storage) {
 	gin.SetMode(cfg.Server.RunMode)
 	r := gin.Default()
 

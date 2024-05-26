@@ -6,7 +6,7 @@ import (
 	"github.com/VadimRight/GraphQLOzon/graph/model"
 	"context"
 	"github.com/google/uuid"
-	"github.com/VadimRight/GraphQLOzon/bootstrap"
+	"github.com/VadimRight/GraphQLOzon/internal/config"
 	"log"
 	"fmt"
 	"errors"
@@ -26,7 +26,7 @@ func NewPostgresStorage(db *sql.DB) *PostgresStorage {
 }
 
 // Функция инициализации базы данных и подключение к базе данных
-func InitPostgresDatabase(cfg *bootstrap.Config) *PostgresStorage  {
+func InitPostgresDatabase(cfg *config.Config) *PostgresStorage  {
 	const op = "postgres.InitPostgresDatabase"
 
 	dbHost := cfg.Postgres.PostgresHost
