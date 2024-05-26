@@ -1,5 +1,5 @@
 services:
-  app:
+  app-postgres:
     container_name: graphQLServer-postgres
     build:
       context: .

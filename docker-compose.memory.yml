@@ -1,5 +1,5 @@
 services:
-  app:
+  app-memory:
     container_name: graphQLServer-in-memory
     build:
       context: .
