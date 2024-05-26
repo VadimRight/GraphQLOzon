@@ -92,10 +92,6 @@ func (m *MockPostService) GetAllPosts(ctx context.Context, limit, offset *int) (
 	return args.Get(0).([]*model.Post), args.Error(1)
 }
 
-// MockCommentService is a mock implementation of the CommentService interface
-type MockCommentService struct {
-	mock.Mock
-}
 
 func (m *MockCommentService) GetCommentsByPostID(ctx context.Context, postID string, limit, offset *int) ([]*model.CommentResponse, error) {
 	args := m.Called(ctx, postID, limit, offset)
