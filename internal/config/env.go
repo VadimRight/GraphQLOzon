@@ -67,7 +67,7 @@ func LoadConfig() *Config {
 // Приватная функция загрузки конфигурации пути к файлу .env и типу .env (локальный или докер)
 func loadEnvConfig() *EnvConfig {
 	const opt = "internal.config.LoadEnvConfig"
-	err := godotenv.Load("env/.env")
+	err := godotenv.Load("env-files/.env")
 	if err != nil {
 		log.Fatalf("%s %v", opt, err)
 	}		
@@ -94,7 +94,7 @@ func loadEnvConfig() *EnvConfig {
 // Приватная функция загрузки конфигурации Postgres базы данных
 func loadPostgresConfig() *PostgresConfig {
 	const opt = "internal.config.LoadPostgresConfig"
-	err := godotenv.Load("env/.env")
+	err := godotenv.Load("env-files/.env")
 	if err != nil {
 		log.Fatalf("%s: %v", opt, err)
 	}
@@ -126,7 +126,7 @@ func loadPostgresConfig() *PostgresConfig {
 
 // Приватная функция загрузки конфигурации сервера
 func loadServerConfig() *ServerConfig {
-	err := godotenv.Load("env/.env")
+	err := godotenv.Load("env-files/.env")
 	const opt = "internal.config.LoadPostgresConfig"
 	if err != nil {
 		log.Fatalf("%s: %v", opt, err)
@@ -167,7 +167,7 @@ func loadServerConfig() *ServerConfig {
 }
 
 func loadStorageTypeConfig() *StorageTypeConfig {
-	err := godotenv.Load("env/.env")
+	err := godotenv.Load("env-files/.env")
 	const opt = "internal.config.loadStorageTypeConfig"
 	if err != nil {
 		log.Fatalf("%s: %v", opt, err)
