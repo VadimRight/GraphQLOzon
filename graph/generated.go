@@ -14,7 +14,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/VadimRight/GraphQLOzon/graph/model"
+	"github.com/VadimRight/GraphQLOzon/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -1166,7 +1166,7 @@ func (ec *executionContext) _Comment_authorComment(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Comment_authorComment(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1439,7 +1439,7 @@ func (ec *executionContext) _CommentResponse_authorComment(ctx context.Context, 
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CommentResponse_authorComment(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1495,7 +1495,7 @@ func (ec *executionContext) _CommentResponse_replies(ctx context.Context, field 
 	}
 	res := resTmp.([]*model.CommentResponse)
 	fc.Result = res
-	return ec.marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐCommentResponseᚄ(ctx, field.Selections, res)
+	return ec.marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐCommentResponseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CommentResponse_replies(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1555,7 +1555,7 @@ func (ec *executionContext) _Mutation_loginUser(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.Token)
 	fc.Result = res
-	return ec.marshalNToken2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐToken(ctx, field.Selections, res)
+	return ec.marshalNToken2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐToken(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_loginUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1614,7 +1614,7 @@ func (ec *executionContext) _Mutation_registerUser(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_registerUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1681,7 +1681,7 @@ func (ec *executionContext) _Mutation_createPost(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.Post)
 	fc.Result = res
-	return ec.marshalNPost2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
+	return ec.marshalNPost2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐPost(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createPost(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1750,7 +1750,7 @@ func (ec *executionContext) _Mutation_createComment(ctx context.Context, field g
 	}
 	res := resTmp.(*model.CommentResponse)
 	fc.Result = res
-	return ec.marshalNCommentResponse2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐCommentResponse(ctx, field.Selections, res)
+	return ec.marshalNCommentResponse2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐCommentResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createComment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1953,7 +1953,7 @@ func (ec *executionContext) _Post_authorPost(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Post_authorPost(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2009,7 +2009,7 @@ func (ec *executionContext) _Post_comments(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.CommentResponse)
 	fc.Result = res
-	return ec.marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐCommentResponseᚄ(ctx, field.Selections, res)
+	return ec.marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐCommentResponseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Post_comments(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2113,7 +2113,7 @@ func (ec *executionContext) _Query_userByUsername(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_userByUsername(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2180,7 +2180,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_users(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2244,7 +2244,7 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalOUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2311,7 +2311,7 @@ func (ec *executionContext) _Query_posts(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*model.Post)
 	fc.Result = res
-	return ec.marshalNPost2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐPostᚄ(ctx, field.Selections, res)
+	return ec.marshalNPost2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐPostᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_posts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2377,7 +2377,7 @@ func (ec *executionContext) _Query_post(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(*model.Post)
 	fc.Result = res
-	return ec.marshalOPost2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐPost(ctx, field.Selections, res)
+	return ec.marshalOPost2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐPost(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_post(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2446,7 +2446,7 @@ func (ec *executionContext) _Query_postsByUserID(ctx context.Context, field grap
 	}
 	res := resTmp.([]*model.Post)
 	fc.Result = res
-	return ec.marshalNPost2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐPostᚄ(ctx, field.Selections, res)
+	return ec.marshalNPost2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐPostᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_postsByUserID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2515,7 +2515,7 @@ func (ec *executionContext) _Query_comments(ctx context.Context, field graphql.C
 	}
 	res := resTmp.([]*model.CommentResponse)
 	fc.Result = res
-	return ec.marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐCommentResponseᚄ(ctx, field.Selections, res)
+	return ec.marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐCommentResponseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_comments(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2583,7 +2583,7 @@ func (ec *executionContext) _Query_comment(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*model.CommentResponse)
 	fc.Result = res
-	return ec.marshalOCommentResponse2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐCommentResponse(ctx, field.Selections, res)
+	return ec.marshalOCommentResponse2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐCommentResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_comment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2959,7 +2959,7 @@ func (ec *executionContext) _User_posts(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.([]*model.Post)
 	fc.Result = res
-	return ec.marshalNPost2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐPostᚄ(ctx, field.Selections, res)
+	return ec.marshalNPost2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐPostᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_posts(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3017,7 +3017,7 @@ func (ec *executionContext) _User_comments(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.CommentResponse)
 	fc.Result = res
-	return ec.marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐCommentResponseᚄ(ctx, field.Selections, res)
+	return ec.marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐCommentResponseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_User_comments(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5745,11 +5745,11 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCommentResponse2githubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐCommentResponse(ctx context.Context, sel ast.SelectionSet, v model.CommentResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNCommentResponse2githubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐCommentResponse(ctx context.Context, sel ast.SelectionSet, v model.CommentResponse) graphql.Marshaler {
 	return ec._CommentResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐCommentResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.CommentResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐCommentResponseᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.CommentResponse) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5773,7 +5773,7 @@ func (ec *executionContext) marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRi
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNCommentResponse2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐCommentResponse(ctx, sel, v[i])
+			ret[i] = ec.marshalNCommentResponse2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐCommentResponse(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5793,7 +5793,7 @@ func (ec *executionContext) marshalNCommentResponse2ᚕᚖgithubᚗcomᚋVadimRi
 	return ret
 }
 
-func (ec *executionContext) marshalNCommentResponse2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐCommentResponse(ctx context.Context, sel ast.SelectionSet, v *model.CommentResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNCommentResponse2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐCommentResponse(ctx context.Context, sel ast.SelectionSet, v *model.CommentResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -5818,11 +5818,11 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) marshalNPost2githubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v model.Post) graphql.Marshaler {
+func (ec *executionContext) marshalNPost2githubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v model.Post) graphql.Marshaler {
 	return ec._Post(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNPost2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐPostᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Post) graphql.Marshaler {
+func (ec *executionContext) marshalNPost2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐPostᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Post) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5846,7 +5846,7 @@ func (ec *executionContext) marshalNPost2ᚕᚖgithubᚗcomᚋVadimRightᚋGraph
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNPost2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐPost(ctx, sel, v[i])
+			ret[i] = ec.marshalNPost2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐPost(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5866,7 +5866,7 @@ func (ec *executionContext) marshalNPost2ᚕᚖgithubᚗcomᚋVadimRightᚋGraph
 	return ret
 }
 
-func (ec *executionContext) marshalNPost2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *model.Post) graphql.Marshaler {
+func (ec *executionContext) marshalNPost2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *model.Post) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -5891,11 +5891,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNToken2githubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐToken(ctx context.Context, sel ast.SelectionSet, v model.Token) graphql.Marshaler {
+func (ec *executionContext) marshalNToken2githubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐToken(ctx context.Context, sel ast.SelectionSet, v model.Token) graphql.Marshaler {
 	return ec._Token(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNToken2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐToken(ctx context.Context, sel ast.SelectionSet, v *model.Token) graphql.Marshaler {
+func (ec *executionContext) marshalNToken2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐToken(ctx context.Context, sel ast.SelectionSet, v *model.Token) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -5905,11 +5905,11 @@ func (ec *executionContext) marshalNToken2ᚖgithubᚗcomᚋVadimRightᚋGraphQL
 	return ec._Token(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNUser2githubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2githubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5933,7 +5933,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋVadimRightᚋGraph
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5953,7 +5953,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋVadimRightᚋGraph
 	return ret
 }
 
-func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -6242,7 +6242,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOCommentResponse2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐCommentResponse(ctx context.Context, sel ast.SelectionSet, v *model.CommentResponse) graphql.Marshaler {
+func (ec *executionContext) marshalOCommentResponse2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐCommentResponse(ctx context.Context, sel ast.SelectionSet, v *model.CommentResponse) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6281,7 +6281,7 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) marshalOPost2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *model.Post) graphql.Marshaler {
+func (ec *executionContext) marshalOPost2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *model.Post) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -6304,7 +6304,7 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋVadimRightᚋGraphQLOzonᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

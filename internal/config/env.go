@@ -1,4 +1,4 @@
-package bootstrap
+package config
 
 import (
 	"log"
@@ -15,7 +15,7 @@ type Config struct {
 	Storage *StorageTypeConfig 
 }
 
-// Тип конифурации 
+// Тип конифурации типа хранилища, применяемого при запуске сервера 
 type StorageTypeConfig struct {
 	StorageType string
 }

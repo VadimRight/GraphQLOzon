@@ -1,4 +1,3 @@
-// middlewares/auth.go
 package middleware
 
 import (
@@ -14,8 +13,16 @@ type authString string
 
 var AuthKey = authString("auth")
 
+type AuthMiddleware struct {
+	authService service.AuthService
+}
+
+func NewAuthMiddleware(authService service.AuthService) *AuthMiddleware {
+	return &AuthMiddleware{authService: authService}
+}
+
 // Middleware для аутентификации
-func AuthMiddleware() gin.HandlerFunc {
+func (a *AuthMiddleware) Handler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := c.GetHeader("Authorization")
 		fmt.Println("Authorization Header:", auth)
@@ -39,7 +46,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		fmt.Println("Token:", token)
 
 		// Валидируем токен с помощью службы JWT
-		validate, err := service.JwtValidate(context.Background(), token)
+		validate, err := a.authService.ValidateToken(context.Background(), token)
 		if err != nil || !validate.Valid {
 			fmt.Println("Validation Error:", err)
 			// Если токен недействителен, возвращаем ошибку 403 Forbidden
@@ -64,4 +71,3 @@ func CtxValue(ctx context.Context) *service.JwtCustomClaim {
 	raw, _ := ctx.Value(authString("auth")).(*service.JwtCustomClaim)
 	return raw
 }
-
