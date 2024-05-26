@@ -1,4 +1,3 @@
-// service/user.go
 package service
 
 import (
@@ -19,11 +18,12 @@ type UserService interface {
 }
 
 type userService struct {
-	storage         storage.Storage
-	commentService  CommentService
+	storage        storage.Storage
+	commentService CommentService
 }
 
-func NewUserService(storage storage.Storage, commentService CommentService) UserService { return &userService{storage: storage, commentService: commentService}
+func NewUserService(storage storage.Storage, commentService CommentService) UserService {
+	return &userService{storage: storage, commentService: commentService}
 }
 
 func (s *userService) GetAllUsers(ctx context.Context) ([]*model.User, error) {
@@ -63,7 +63,7 @@ func (s *userService) GetPostsByUserID(ctx context.Context, userID string, limit
 		return nil, err
 	}
 	for _, post := range posts {
-		post.Comments, err = s.commentService.GetCommentsByPostID(ctx, post.ID, limit, offset) // Используем commentService
+		post.Comments, err = s.commentService.GetCommentsByPostID(ctx, post.ID, limit, offset)
 		if err != nil {
 			return nil, err
 		}
@@ -74,3 +74,4 @@ func (s *userService) GetPostsByUserID(ctx context.Context, userID string, limit
 func (s *userService) GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error) {
 	return s.storage.GetCommentsByUserID(ctx, userID)
 }
+

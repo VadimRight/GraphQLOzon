@@ -2,7 +2,6 @@ package graph
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/VadimRight/GraphQLOzon/graph/model"
@@ -33,12 +32,6 @@ func (m *MockCommentService) GetCommentsByParentID(ctx context.Context, parentID
 func (m *MockCommentService) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {
 	args := m.Called(ctx, commentText, itemId, userID)
 	return args.Get(0).(*model.CommentResponse), args.Error(1)
-}
-
-
-func (m *MockUserService) GetUserByID(ctx context.Context, userID string) (*model.User, error) {
-	args := m.Called(ctx, userID)
-	return args.Get(0).(*model.User), args.Error(1)
 }
 
 // Tests for CommentService methods

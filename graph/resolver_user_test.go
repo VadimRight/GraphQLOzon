@@ -98,10 +98,6 @@ func (m *MockCommentService) GetCommentsByPostID(ctx context.Context, postID str
 	return args.Get(0).([]*model.CommentResponse), args.Error(1)
 }
 
-func (m *MockCommentService) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
-	args := m.Called(ctx, parentID, limit, offset)
-	return args.Get(0).([]*model.CommentResponse), args.Error(1)
-}
 
 // Tests for UserService methods
 
