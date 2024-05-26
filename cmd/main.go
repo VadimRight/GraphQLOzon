@@ -7,12 +7,13 @@ import (
 )
 
 func main() {
+	// Загрузка конфигурации
 	cfg := config.LoadConfig()
-	storageType := storage.StorageType(cfg)
-	defer func() {
-		if postgresStorage, ok := storageType.(*storage.PostgresStorage); ok {
-			postgresStorage.ClosePostgres()
-		}
-	}()
-	api.InitServer(cfg, storageType)
+
+	// Инициализация хранилища данных
+	dbStorage := storage.InitPostgresDatabase(cfg)
+	defer dbStorage.ClosePostgres()
+
+	// Инициализация и запуск сервера
+	api.InitServer(cfg, dbStorage)
 }
