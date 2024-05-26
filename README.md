@@ -9,3 +9,4 @@
 ![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/515b7841-67b4-4766-9497-95680fd584f9)
 ![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/88bebb5b-2fb4-4121-a336-385300c25605)
 ![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/e756c2cf-1cf9-49d8-9b67-4d6552fcab6c)
+![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/fcd13848-3db1-40c0-aa2a-173e1e873121)
