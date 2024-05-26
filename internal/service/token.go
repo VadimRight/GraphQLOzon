@@ -8,7 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// Структура токенов Bearer, используемыз в данном приложении
+// Структура токенов Bearer, используемых в данном приложении
 type JwtCustomClaim struct {
 	ID string `json:"id"`
 	jwt.StandardClaims
@@ -25,8 +25,19 @@ func getJwtSecret() string {
 	return secret
 }
 
-// Функция генерации токена Bearer 
-func JwtGenerate(ctx context.Context, userID string) (string, error) {
+// AuthService интерфейс для работы с JWT
+type AuthService interface {
+	GenerateToken(ctx context.Context, userID string) (string, error)
+	ValidateToken(ctx context.Context, token string) (*jwt.Token, error)
+}
+
+type authService struct{}
+
+func NewAuthService() AuthService {
+	return &authService{}
+}
+
+func (s *authService) GenerateToken(ctx context.Context, userID string) (string, error) {
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, &JwtCustomClaim{
 		ID: userID,
 		StandardClaims: jwt.StandardClaims{
@@ -43,8 +54,7 @@ func JwtGenerate(ctx context.Context, userID string) (string, error) {
 	return token, nil
 }
 
-// Функция валидации токена
-func JwtValidate(ctx context.Context, token string) (*jwt.Token, error) {
+func (s *authService) ValidateToken(ctx context.Context, token string) (*jwt.Token, error) {
 	return jwt.ParseWithClaims(token, &JwtCustomClaim{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("there's a problem with the signing method")
@@ -52,4 +62,3 @@ func JwtValidate(ctx context.Context, token string) (*jwt.Token, error) {
 		return jwtSecret, nil
 	})
 }
-
