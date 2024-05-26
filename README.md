@@ -21,6 +21,9 @@
  - Replies: Список ответов на данный комментарий, реализующий иерархическую структуру.
  - Модули и зависимости: Модули организованы логически, зависимости инвертированы, что облегчает тестирование и модификацию кода.
 
+### Задание на то, чтобы пользователь мог запрещать комментирование своего поста
+Данная фича реализована путем запонения в базе данных или памяти поля commentable при создании поста - если значение true, то другие пользователи могут оставлять комментарии под постом. Если же значение false, то другие пользователи не могут оставлять свои комментарии.
+
 ### Коментарии в хранилище (либо postgres, либо in-memory)
 Комментарии хранятся и обрабатываются как в базе данных, так и в памяти, с поддержкой иерархической структуры данных. Иерархия достигается с помощью поля parent_comment_id, которое указывает на родительский комментарий. Методы для создания и получения комментариев обеспечивают возможность работы с вложенными комментариями, создавая дерево комментариев.
 
@@ -60,12 +63,20 @@
  - Пагинация: Поддержка пагинации делает систему более эффективной при работе с большими объемами данных. Вы можете запрашивать данные порциями, что снижает нагрузку на сервер и улучшает пользовательский опыт.
 
 # Скриншоты
-![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/d65b648b-b861-44b6-a4af-bc50a8bf355a)
-![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/2267ff20-1f97-4be3-945b-861be61711ba)
-![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/62debdad-747f-4e4e-ac14-e680bbae7094)
-![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/3561079a-1b32-487e-8622-99db11014886)
-![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/b46da74e-9adf-43e3-a650-771724d19d0e)
-![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/515b7841-67b4-4766-9497-95680fd584f9)
-![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/88bebb5b-2fb4-4121-a336-385300c25605)
-![image](https://github.com/VadimRight/GraphQLOzon/assets/116267906/e756c2cf-1cf9-49d8-9b67-4d6552fcab6c)
-![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/fcd13848-3db1-40c0-aa2a-173e1e873121)
+Регистрация пользователя
+![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/27c676cf-1cc5-4f9e-9a6c-03d73eb4e885)
+
+Логин пользователя
+![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/344ebe90-7d67-4359-9fd0-3d900c37011a)
+
+Создание поста пользователем
+![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/0056c8e6-31b0-4a2a-a7c1-fdb0214487f4)
+
+Создание комментария к посту
+![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/c7486853-2ed8-4695-8c54-c3bf256ae552)
+
+Создания комментария к комментарию
+![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/2570f321-4441-448f-9619-977f05b0a64c)
+
+Получения постов пользователя и комментариев к ним и комментариев к комментариям по username
+![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/6b14162e-2697-46ea-aa7d-11ac78472bf0)
