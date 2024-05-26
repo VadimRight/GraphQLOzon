@@ -1,7 +1,9 @@
+// resolver_user_test.go
 package graph
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -92,11 +94,11 @@ func TestLoginUser(t *testing.T) {
 	hashedPassword := "hashedPassword"
 	userID := "1"
 
-	expectedUser := &model.User{ID: "1", Username: "user1", Password: hashedPassword}
+	expectedUser := &model.User{ID: userID, Username: username, Password: hashedPassword}
 	expectedToken := "token"
 
 	mockUserUsecase.On("GetUserByUsername", ctx, username).Return(expectedUser, nil)
-	mockUserUsecase.On("ComparePassword", hashedPassword, password).Return(false)
+	mockUserUsecase.On("ComparePassword", hashedPassword, password).Return(false) // Return false for no error
 	mockUserUsecase.On("GenerateToken", ctx, userID).Return(expectedToken, nil)
 
 	token, err := resolver.LoginUser(ctx, username, password)
@@ -106,3 +108,26 @@ func TestLoginUser(t *testing.T) {
 	mockUserUsecase.AssertExpectations(t)
 }
 
+func TestRegisterUser(t *testing.T) {
+	mockUserUsecase := new(usecase.MockUserUsecase)
+	resolver := &mutationResolver{&Resolver{UserUsecase: mockUserUsecase}}
+
+	ctx := context.Background()
+	username := "newuser"
+	password := "password"
+	hashedPassword := "hashedPassword"
+	expectedUser := &model.User{ID: "1", Username: username, Password: hashedPassword}
+
+	// Mock the GetUserByUsername to return an error indicating the user does not exist
+	mockUserUsecase.On("GetUserByUsername", ctx, username).Return(nil, errors.New("user not found"))
+	// Mock the HashPassword to return the hashed password
+	mockUserUsecase.On("HashPassword", password).Return(hashedPassword, nil)
+	// Mock the UserCreate to return the created user
+	mockUserUsecase.On("UserCreate", ctx, username, hashedPassword).Return(expectedUser, nil)
+
+	user, err := resolver.RegisterUser(ctx, username, password)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedUser, user)
+	mockUserUsecase.AssertExpectations(t)
+}
