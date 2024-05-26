@@ -9,6 +9,7 @@ import (
 	"errors"
 )
 
+// InMemoryStorage представляет собой структуру хранения данных в памяти
 type InMemoryStorage struct {
 	users    map[string]*model.User
 	posts    map[string]*model.Post
@@ -16,7 +17,7 @@ type InMemoryStorage struct {
 	mu       sync.RWMutex
 }
 
-// Функция возвращающая объект InMemoryStorage
+// NewInMemoryStorage возвращает новый объект InMemoryStorage
 func NewInMemoryStorage() *InMemoryStorage {
 	return &InMemoryStorage{
 		users:    make(map[string]*model.User),
@@ -25,16 +26,16 @@ func NewInMemoryStorage() *InMemoryStorage {
 	}
 }
 
+// InitInMemoryStorage инициализирует хранилище в памяти с начальными данными
 func InitInMemoryStorage() *InMemoryStorage {
 	storage := NewInMemoryStorage()
-
 	// Создание начальных данных, если нужно
 	storage.mu.Lock()
 	defer storage.mu.Unlock()
 	return storage
 }
 
-// Реализация методов интерфейса Storage для in-memory
+// GetUserByUsername возвращает пользователя по имени пользователя
 func (s *InMemoryStorage) GetUserByUsername(ctx context.Context, username string) (*model.User, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -46,6 +47,7 @@ func (s *InMemoryStorage) GetUserByUsername(ctx context.Context, username string
 	return nil, fmt.Errorf("user not found")
 }
 
+// UserCreate создает нового пользователя
 func (s *InMemoryStorage) UserCreate(ctx context.Context, username string, password string) (*model.User, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -55,6 +57,7 @@ func (s *InMemoryStorage) UserCreate(ctx context.Context, username string, passw
 	return user, nil
 }
 
+// GetUserByID возвращает пользователя по его ID
 func (s *InMemoryStorage) GetUserByID(ctx context.Context, userID string) (*model.User, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -65,6 +68,7 @@ func (s *InMemoryStorage) GetUserByID(ctx context.Context, userID string) (*mode
 	return user, nil
 }
 
+// GetAllUsers возвращает всех пользователей
 func (s *InMemoryStorage) GetAllUsers(ctx context.Context) ([]*model.User, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -75,6 +79,7 @@ func (s *InMemoryStorage) GetAllUsers(ctx context.Context) ([]*model.User, error
 	return users, nil
 }
 
+// GetAllPosts возвращает все посты с поддержкой пагинации
 func (s *InMemoryStorage) GetAllPosts(ctx context.Context, limit, offset *int) ([]*model.Post, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -100,6 +105,7 @@ func (s *InMemoryStorage) GetAllPosts(ctx context.Context, limit, offset *int) (
 	return posts, nil
 }
 
+// GetPostsByUserID возвращает посты по ID пользователя с поддержкой пагинации
 func (s *InMemoryStorage) GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -127,6 +133,7 @@ func (s *InMemoryStorage) GetPostsByUserID(ctx context.Context, userID string, l
 	return posts, nil
 }
 
+// GetPostByID возвращает пост по его ID
 func (s *InMemoryStorage) GetPostByID(ctx context.Context, postID string) (*model.Post, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -137,6 +144,7 @@ func (s *InMemoryStorage) GetPostByID(ctx context.Context, postID string) (*mode
 	return post, nil
 }
 
+// CreatePost создает новый пост
 func (s *InMemoryStorage) CreatePost(ctx context.Context, id, text, authorID string, commentable bool) (*model.Post, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -145,6 +153,7 @@ func (s *InMemoryStorage) CreatePost(ctx context.Context, id, text, authorID str
 	return post, nil
 }
 
+// GetAllComments возвращает все комментарии с поддержкой пагинации
 func (s *InMemoryStorage) GetAllComments(ctx context.Context, limit, offset *int) ([]*model.CommentResponse, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -155,6 +164,7 @@ func (s *InMemoryStorage) GetAllComments(ctx context.Context, limit, offset *int
 	return comments, nil
 }
 
+// GetCommentsByPostID возвращает комментарии по ID поста с поддержкой пагинации
 func (s *InMemoryStorage) GetCommentsByPostID(ctx context.Context, postID string, limit, offset *int) ([]*model.CommentResponse, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -177,6 +187,7 @@ func (s *InMemoryStorage) GetCommentsByPostID(ctx context.Context, postID string
 	return comments[start:end], nil
 }
 
+// GetCommentsByParentID возвращает ответы на комментарии по ID родительского комментария с поддержкой пагинации
 func (s *InMemoryStorage) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -203,6 +214,7 @@ func (s *InMemoryStorage) GetCommentsByParentID(ctx context.Context, parentID st
 	return comments, nil
 }
 
+// GetCommentByID возвращает комментарий по его ID
 func (s *InMemoryStorage) GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -213,6 +225,7 @@ func (s *InMemoryStorage) GetCommentByID(ctx context.Context, id string) (*model
 	return comment, nil
 }
 
+// GetCommentsByUserID возвращает комментарии по ID пользователя
 func (s *InMemoryStorage) GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -225,6 +238,7 @@ func (s *InMemoryStorage) GetCommentsByUserID(ctx context.Context, userID string
 	return comments, nil
 }
 
+// CreateComment создает новый комментарий
 func (s *InMemoryStorage) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

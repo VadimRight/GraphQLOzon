@@ -1,32 +1,30 @@
 package storage
 
 import (
-	"database/sql"
-	_ "github.com/lib/pq"
-	"github.com/VadimRight/GraphQLOzon/model"
 	"context"
-	"github.com/google/uuid"
-	"github.com/VadimRight/GraphQLOzon/internal/config"
-	"log"
-	"fmt"
+	"database/sql"
 	"errors"
+	"fmt"
+	"log"
+
+	"github.com/VadimRight/GraphQLOzon/internal/config"
+	"github.com/VadimRight/GraphQLOzon/model"
+	"github.com/google/uuid"
+	_ "github.com/lib/pq"
 )
 
-// Тип базы данных
+// PostgresStorage представляет собой структуру для работы с базой данных PostgreSQL
 type PostgresStorage struct {
 	DB *sql.DB
 }
 
-
-// Все SQL запросы и функции работы с базой данных храняться в файле graph/resolver.go, а также вспомогательные запросы для обеспечения функционала схемы и резольвера храняться в сервисе пользователей в internal/service/user.go
-
-// Функция возвращающая объект PostgresStorage
+// NewPostgresStorage возвращает объект PostgresStorage
 func NewPostgresStorage(db *sql.DB) *PostgresStorage {
-    return &PostgresStorage{DB: db}
+	return &PostgresStorage{DB: db}
 }
 
-// Функция инициализации базы данных и подключение к базе данных
-func InitPostgresDatabase(cfg *config.Config) *PostgresStorage  {
+// InitPostgresDatabase инициализирует базу данных и подключается к базе данных PostgreSQL
+func InitPostgresDatabase(cfg *config.Config) *PostgresStorage {
 	const op = "postgres.InitPostgresDatabase"
 
 	dbHost := cfg.Postgres.PostgresHost
@@ -35,24 +33,28 @@ func InitPostgresDatabase(cfg *config.Config) *PostgresStorage  {
 	dbPasswd := cfg.Postgres.PostgresPassword
 	dbName := cfg.Postgres.DatabaseName
 
-	postgresUrl := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",dbHost, dbPort, dbUser, dbPasswd, dbName)
+	postgresUrl := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPasswd, dbName)
 	db, err := sql.Open("postgres", postgresUrl)
 	if err != nil {
 		log.Fatalf("%s: %v", op, err)
 	}
 
-	// Создание таблицы поользователя, у которго есть зашифрованный пароль, имя и уникальный ID 
+	// Создание таблицы пользователей
 	createUserTable, err := db.Prepare(`
 	CREATE TABLE IF NOT EXISTS users (
 		id UUID PRIMARY KEY,
 		username VARCHAR(20) NOT NULL UNIQUE,
 		password CHAR(60) NOT NULL UNIQUE
 	);`)
-	if err != nil {	log.Fatalf("%s: %v", op, err) }
+	if err != nil {
+		log.Fatalf("%s: %v", op, err)
+	}
 	_, err = createUserTable.Exec()
-	if err != nil {	log.Fatalf("%s: %v", op, err) }
+	if err != nil {
+		log.Fatalf("%s: %v", op, err)
+	}
 
-	// Создание таблицы постов, у которых есть текст, уникальный ID, а также ID пользователя, написавшего пост
+	// Создание таблицы постов
 	createPostTable, err := db.Prepare(`
 	CREATE TABLE IF NOT EXISTS post (
 		id UUID PRIMARY KEY,
@@ -60,12 +62,16 @@ func InitPostgresDatabase(cfg *config.Config) *PostgresStorage  {
 		author_id UUID NOT NULL,
 		commentable BOOLEAN NOT NULL,
 		FOREIGN KEY (author_id) REFERENCES users(id));
-	`)	
-	if err != nil {	log.Fatalf("%s: %v", op, err) }
+	`)
+	if err != nil {
+		log.Fatalf("%s: %v", op, err)
+	}
 	_, err = createPostTable.Exec()
-	if err != nil {	log.Fatalf("%s: %v", op, err) }
+	if err != nil {
+		log.Fatalf("%s: %v", op, err)
+	}
 
-	// Создание таблицы комментариев, у которых есть сам текст комменатария, ID пользователя, оставившего комментарий, а также есть ID поста, под которым комментарий был написан и это поле всегда заполяется даже если комментарий оставлен не прямо к посту, а также есть ID коментария - это поле заполяется только тогда, когда комментарий оставлен к другому коментарию. Такая конструкция сущности комментария позволяет нам создавать иерархическую структуру данных.
+	// Создание таблицы комментариев
 	createCommentTable, err := db.Prepare(`
 	CREATE TABLE IF NOT EXISTS comment (
 		id UUID PRIMARY KEY,
@@ -73,24 +79,28 @@ func InitPostgresDatabase(cfg *config.Config) *PostgresStorage  {
 		author_id UUID NOT NULL,
 		post_id UUID NOT NULL,
 		parent_comment_id UUID,
-    		created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+		created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (author_id) REFERENCES users(id),
 		FOREIGN KEY (post_id) REFERENCES post(id),
 		FOREIGN KEY (parent_comment_id) REFERENCES comment(id)
 	);`)
-	if err != nil {	log.Fatalf("%s: %v", op, err) }
+	if err != nil {
+		log.Fatalf("%s: %v", op, err)
+	}
 	_, err = createCommentTable.Exec()
-	if err != nil {	log.Fatalf("%s: %v", op, err) }
+	if err != nil {
+		log.Fatalf("%s: %v", op, err)
+	}
 
 	return &PostgresStorage{DB: db}
 }
 
-// Функция закрытия соединения с базой данных
-
+// ClosePostgres закрывает соединение с базой данных
 func (s *PostgresStorage) ClosePostgres() error {
 	return s.DB.Close()
 }
-// Реализация методов интерфейса Storage для PostgreSQL
+
+// GetUserByUsername возвращает пользователя по его имени
 func (s *PostgresStorage) GetUserByUsername(ctx context.Context, username string) (*model.User, error) {
 	var user model.User
 	err := s.DB.QueryRowContext(ctx, "SELECT id, username, password FROM users WHERE username=$1", username).Scan(&user.ID, &user.Username, &user.Password)
@@ -100,6 +110,7 @@ func (s *PostgresStorage) GetUserByUsername(ctx context.Context, username string
 	return &user, nil
 }
 
+// UserCreate создает нового пользователя
 func (s *PostgresStorage) UserCreate(ctx context.Context, username string, password string) (*model.User, error) {
 	id := uuid.New().String()
 	_, err := s.DB.ExecContext(ctx, "INSERT INTO users (id, username, password) VALUES ($1, $2, $3)", id, username, password)
@@ -109,6 +120,7 @@ func (s *PostgresStorage) UserCreate(ctx context.Context, username string, passw
 	return &model.User{ID: id, Username: username, Password: password}, nil
 }
 
+// GetUserByID возвращает пользователя по его ID
 func (s *PostgresStorage) GetUserByID(ctx context.Context, userID string) (*model.User, error) {
 	var user model.User
 	err := s.DB.QueryRowContext(ctx, "SELECT id, username FROM users WHERE id=$1", userID).Scan(&user.ID, &user.Username)
@@ -118,6 +130,7 @@ func (s *PostgresStorage) GetUserByID(ctx context.Context, userID string) (*mode
 	return &user, nil
 }
 
+// GetAllUsers возвращает всех пользователей
 func (s *PostgresStorage) GetAllUsers(ctx context.Context) ([]*model.User, error) {
 	rows, err := s.DB.QueryContext(ctx, "SELECT id, username FROM users")
 	if err != nil {
@@ -136,6 +149,7 @@ func (s *PostgresStorage) GetAllUsers(ctx context.Context) ([]*model.User, error
 	return users, nil
 }
 
+// GetAllPosts возвращает все посты с поддержкой пагинации
 func (s *PostgresStorage) GetAllPosts(ctx context.Context, limit, offset *int) ([]*model.Post, error) {
 	query := "SELECT id, text, author_id, commentable FROM post"
 	var rows *sql.Rows
@@ -164,6 +178,7 @@ func (s *PostgresStorage) GetAllPosts(ctx context.Context, limit, offset *int) (
 	return posts, nil
 }
 
+// GetPostsByUserID возвращает посты пользователя с поддержкой пагинации
 func (s *PostgresStorage) GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error) {
 	query := "SELECT id, text, author_id, commentable FROM post WHERE author_id = $1"
 	var rows *sql.Rows
@@ -192,6 +207,7 @@ func (s *PostgresStorage) GetPostsByUserID(ctx context.Context, userID string, l
 	return posts, nil
 }
 
+// GetPostByID возвращает пост по его ID
 func (s *PostgresStorage) GetPostByID(ctx context.Context, postID string) (*model.Post, error) {
 	var post model.Post
 	err := s.DB.QueryRowContext(ctx, "SELECT id, text, author_id, commentable FROM post WHERE id=$1", postID).Scan(&post.ID, &post.Text, &post.AuthorID, &post.Commentable)
@@ -201,6 +217,7 @@ func (s *PostgresStorage) GetPostByID(ctx context.Context, postID string) (*mode
 	return &post, nil
 }
 
+// CreatePost создает новый пост
 func (s *PostgresStorage) CreatePost(ctx context.Context, id, text, authorID string, commentable bool) (*model.Post, error) {
 	_, err := s.DB.ExecContext(ctx, "INSERT INTO post (id, text, author_id, commentable) VALUES ($1, $2, $3, $4)", id, text, authorID, commentable)
 	if err != nil {
@@ -209,6 +226,7 @@ func (s *PostgresStorage) CreatePost(ctx context.Context, id, text, authorID str
 	return &model.Post{ID: id, Text: text, AuthorID: authorID, Commentable: commentable}, nil
 }
 
+// GetAllComments возвращает все комментарии с поддержкой пагинации
 func (s *PostgresStorage) GetAllComments(ctx context.Context, limit, offset *int) ([]*model.CommentResponse, error) {
 	query := "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment"
 	params := []interface{}{}
@@ -241,6 +259,7 @@ func (s *PostgresStorage) GetAllComments(ctx context.Context, limit, offset *int
 	return comments, nil
 }
 
+// GetCommentsByPostID возвращает комментарии к посту с поддержкой пагинации
 func (s *PostgresStorage) GetCommentsByPostID(ctx context.Context, postID string, limit, offset *int) ([]*model.CommentResponse, error) {
 	query := "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE post_id=$1"
 	args := []interface{}{postID}
@@ -272,6 +291,7 @@ func (s *PostgresStorage) GetCommentsByPostID(ctx context.Context, postID string
 	return comments, nil
 }
 
+// GetCommentsByParentID возвращает комментарии по ID родительского комментария с поддержкой пагинации
 func (s *PostgresStorage) GetCommentsByParentID(ctx context.Context, parentID string, limit, offset *int) ([]*model.CommentResponse, error) {
 	query := "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE parent_comment_id=$1"
 
@@ -294,6 +314,7 @@ func (s *PostgresStorage) GetCommentsByParentID(ctx context.Context, parentID st
 	return scanComments(rows)
 }
 
+// scanComments сканирует строки из результата запроса и возвращает список комментариев
 func scanComments(rows *sql.Rows) ([]*model.CommentResponse, error) {
 	var comments []*model.CommentResponse
 	for rows.Next() {
@@ -310,6 +331,7 @@ func scanComments(rows *sql.Rows) ([]*model.CommentResponse, error) {
 	return comments, nil
 }
 
+// GetCommentByID возвращает комментарий по его ID
 func (s *PostgresStorage) GetCommentByID(ctx context.Context, id string) (*model.CommentResponse, error) {
 	var comment model.CommentResponse
 	err := s.DB.QueryRowContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE id=$1", id).Scan(&comment.ID, &comment.Comment, &comment.AuthorID, &comment.PostID, &comment.ParentCommentID)
@@ -319,6 +341,7 @@ func (s *PostgresStorage) GetCommentByID(ctx context.Context, id string) (*model
 	return &comment, nil
 }
 
+// GetCommentsByUserID возвращает комментарии пользователя
 func (s *PostgresStorage) GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error) {
 	rows, err := s.DB.QueryContext(ctx, "SELECT id, comment, author_id, post_id, parent_comment_id FROM comment WHERE author_id=$1", userID)
 	if err != nil {
@@ -337,6 +360,7 @@ func (s *PostgresStorage) GetCommentsByUserID(ctx context.Context, userID string
 	return comments, nil
 }
 
+// CreateComment создает новый комментарий
 func (s *PostgresStorage) CreateComment(ctx context.Context, commentText, itemId, userID string) (*model.CommentResponse, error) {
 	var isReply bool
 	var parentCommentID *string
