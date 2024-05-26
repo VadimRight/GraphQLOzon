@@ -1,6 +1,6 @@
 services:
   app:
-    container_name: graphQLServer
+    container_name: graphQLServer-in-memory
     build:
       context: .
       dockerfile: ./Dockerfile

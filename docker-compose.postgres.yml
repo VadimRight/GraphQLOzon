@@ -1,6 +1,6 @@
 services:
   app:
-    container_name: graphQLServer
+    container_name: graphQLServer-postgres
     build:
       context: .
       dockerfile: ./Dockerfile
