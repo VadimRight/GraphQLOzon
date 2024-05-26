@@ -13,7 +13,7 @@ type UserUsecase interface {
 	GetUserByUsername(ctx context.Context, username string) (*model.User, error)
 	UserCreate(ctx context.Context, username string, password string) (*model.User, error)
 	HashPassword(password string) (string, error)
-	ComparePassword(hashed string, normal string) error
+	ComparePassword(hashed string, normal string) bool
 	GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error)
 	GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error)
 	GetUserByID(ctx context.Context, userID string) (*model.User, error)
@@ -94,7 +94,7 @@ func (s *userUsecase) HashPassword(password string) (string, error) {
 	return s.passwordService.HashPassword(password)
 }
 
-func (s *userUsecase) ComparePassword(hashed string, normal string) error {
+func (s *userUsecase) ComparePassword(hashed string, normal string) bool {
 	return s.passwordService.ComparePassword(hashed, normal)
 }
 

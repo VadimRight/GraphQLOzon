@@ -5,7 +5,7 @@ import "golang.org/x/crypto/bcrypt"
 // PasswordService интерфейс для работы с паролями
 type PasswordService interface {
 	HashPassword(password string) (string, error)
-	ComparePassword(hashed string, normal string) error
+	ComparePassword(hashed string, normal string) bool
 }
 
 type passwordService struct{}
@@ -22,6 +22,7 @@ func (s *passwordService) HashPassword(password string) (string, error) {
 	return string(hashed), nil
 }
 
-func (s *passwordService) ComparePassword(hashed string, normal string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hashed), []byte(normal))
+func (s *passwordService) ComparePassword(hashed string, normal string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(normal))
+    	return err == nil
 }

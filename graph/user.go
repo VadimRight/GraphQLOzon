@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/VadimRight/GraphQLOzon/model"
 	"errors"
+	"fmt"
 )
 
 // Функция получения всех пользователей
@@ -168,8 +169,11 @@ func (r *mutationResolver) LoginUser(ctx context.Context, username string, passw
 	if err != nil {
 		return nil, err
 	}
-	if err := r.UserUsecase.ComparePassword(getUser.Password, password); err != nil {
-		return nil, err
+	fmt.Println(getUser.Password)
+	fmt.Println(password)
+	dismatch := r.UserUsecase.ComparePassword(getUser.Password, password) 
+	if dismatch == true {
+		return nil, errors.New("Incorrect password")
 	}
 	token, err := r.UserUsecase.GenerateToken(ctx, getUser.ID)
 	if err != nil {
