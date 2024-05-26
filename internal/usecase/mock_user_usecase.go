@@ -2,9 +2,9 @@ package usecase
 
 import (
 	"context"
+	"github.com/stretchr/testify/mock"
 	"github.com/VadimRight/GraphQLOzon/model"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/stretchr/testify/mock"
 )
 
 type MockUserUsecase struct {
@@ -59,18 +59,4 @@ func (m *MockUserUsecase) GenerateToken(ctx context.Context, userID string) (str
 func (m *MockUserUsecase) ValidateToken(ctx context.Context, token string) (*jwt.Token, error) {
 	args := m.Called(ctx, token)
 	return args.Get(0).(*jwt.Token), args.Error(1)
-}
-
-type MockPasswordService struct {
-	mock.Mock
-}
-
-func (m *MockPasswordService) HashPassword(password string) (string, error) {
-	args := m.Called(password)
-	return args.String(0), args.Error(1)
-}
-
-func (m *MockPasswordService) ComparePassword(hashed string, normal string) error {
-	args := m.Called(hashed, normal)
-	return args.Error(0)
 }
