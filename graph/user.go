@@ -171,7 +171,7 @@ func (r *mutationResolver) LoginUser(ctx context.Context, username string, passw
 	if err := r.UserUsecase.ComparePassword(getUser.Password, password); err != nil {
 		return nil, err
 	}
-	token, err := r.UserUsecase.authService.GenerateToken(ctx, getUser.ID)
+	token, err := r.UserUsecase.GenerateToken(ctx, getUser.ID)
 	if err != nil {
 		return nil, err
 	}

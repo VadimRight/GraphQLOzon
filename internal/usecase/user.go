@@ -3,8 +3,9 @@ package usecase
 import (
 	"context"
 	"github.com/VadimRight/GraphQLOzon/graph/model"
-	"github.com/VadimRight/GraphQLOzon/storage"
 	"github.com/VadimRight/GraphQLOzon/internal/service"
+	"github.com/VadimRight/GraphQLOzon/storage"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type UserUsecase interface {
@@ -16,6 +17,8 @@ type UserUsecase interface {
 	GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error)
 	GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error)
 	GetUserByID(ctx context.Context, userID string) (*model.User, error)
+	GenerateToken(ctx context.Context, userID string) (string, error)  // Добавлено
+	ValidateToken(ctx context.Context, token string) (*jwt.Token, error)  // Добавлено
 }
 
 type userUsecase struct {
@@ -27,10 +30,10 @@ type userUsecase struct {
 
 func NewUserUsecase(storage storage.Storage, commentUsecase CommentUsecase, passwordService service.PasswordService, authService service.AuthService) UserUsecase {
 	return &userUsecase{
-		storage:        storage,
-		commentUsecase: commentUsecase,
+		storage:         storage,
+		commentUsecase:  commentUsecase,
 		passwordService: passwordService,
-		authService:    authService,
+		authService:     authService,
 	}
 }
 
@@ -93,4 +96,12 @@ func (s *userUsecase) HashPassword(password string) (string, error) {
 
 func (s *userUsecase) ComparePassword(hashed string, normal string) error {
 	return s.passwordService.ComparePassword(hashed, normal)
+}
+
+func (s *userUsecase) GenerateToken(ctx context.Context, userID string) (string, error) {
+	return s.authService.GenerateToken(ctx, userID)
+}
+
+func (s *userUsecase) ValidateToken(ctx context.Context, token string) (*jwt.Token, error) {
+	return s.authService.ValidateToken(ctx, token)
 }
