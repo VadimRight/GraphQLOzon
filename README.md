@@ -83,7 +83,7 @@
 
 # Скриншоты
 Регистрация пользователя
-![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/27c676cf-1cc5-4f9e-9a6c-03d73eb4e885)
+![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/47df8564-1bbf-4787-bb4c-ef9bc2eca4ac)
 
 Логин пользователя
 ![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/344ebe90-7d67-4359-9fd0-3d900c37011a)
