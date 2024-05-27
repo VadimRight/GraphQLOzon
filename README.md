@@ -62,6 +62,19 @@
 
  - Пагинация: Поддержка пагинации делает систему более эффективной при работе с большими объемами данных. Вы можете запрашивать данные порциями, что снижает нагрузку на сервер и улучшает пользовательский опыт.
 
+# Docker
+Реализована возможнсть сборки образа приложения.
+
+### Способ реализации наличия двух типов хранилища
+Приложение имеет два docker-compose файла
+ - docker-compose.postgres.yml - для приложения с postgres хранилищем
+ - docker-compose.memory.yml - для приложения с in-memory хранилищем
+
+### Образы на Docker Hub
+Образы приложения с разными хранилищами опубликованы на Docker Hub
+ - https://hub.docker.com/repository/docker/vadimright/graphqlozon-app-postgres/general
+ - https://hub.docker.com/repository/docker/vadimright/graphqlozon-app-memory/general
+
 # Скриншоты
 Регистрация пользователя
 ![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/27c676cf-1cc5-4f9e-9a6c-03d73eb4e885)
