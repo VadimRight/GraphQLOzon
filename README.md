@@ -75,6 +75,12 @@
  - https://hub.docker.com/repository/docker/vadimright/graphqlozon-app-postgres/general
  - https://hub.docker.com/repository/docker/vadimright/graphqlozon-app-memory/general
 
+# Покрытие юнит-тестами
+Приложение обладает функционалом для автоматического тестирования резольверов.
+Мок-типы пользователей, постов и комментариев а также методы этих типов являются частью пакета usecase
+Сами же тесты расположены в пакете graph.
+Для тестирования используется внешняя библиотека testify.
+
 # Скриншоты
 Регистрация пользователя
 ![image](https://github.com/VadimRight/VadimTestTask/assets/116267906/27c676cf-1cc5-4f9e-9a6c-03d73eb4e885)
