@@ -2,11 +2,12 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
+
 	"github.com/VadimRight/GraphQLOzon/model"
 	"github.com/google/uuid"
-	"errors"
 )
 
 // InMemoryStorage представляет собой структуру хранения данных в памяти
