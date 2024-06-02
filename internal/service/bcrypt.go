@@ -24,5 +24,5 @@ func (s *passwordService) HashPassword(password string) (string, error) {
 
 func (s *passwordService) ComparePassword(hashed string, normal string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(normal))
-    	return err == nil
+	return err == nil
 }

@@ -2,10 +2,11 @@ package graph
 
 import (
 	"context"
-	"github.com/VadimRight/GraphQLOzon/model"
-	"github.com/VadimRight/GraphQLOzon/internal/middleware"
-	"github.com/google/uuid"
 	"errors"
+
+	"github.com/VadimRight/GraphQLOzon/internal/middleware"
+	"github.com/VadimRight/GraphQLOzon/model"
+	"github.com/google/uuid"
 )
 
 // Метод получения всех постов

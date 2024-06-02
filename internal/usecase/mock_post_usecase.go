@@ -2,8 +2,9 @@ package usecase
 
 import (
 	"context"
-	"github.com/stretchr/testify/mock"
+
 	"github.com/VadimRight/GraphQLOzon/model"
+	"github.com/stretchr/testify/mock"
 )
 
 type MockPostUsecase struct {

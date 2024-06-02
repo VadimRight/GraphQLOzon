@@ -4,10 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/VadimRight/GraphQLOzon/internal/usecase"
 	"github.com/VadimRight/GraphQLOzon/model"
+	"github.com/stretchr/testify/assert"
 )
+
 func TestPosts(t *testing.T) {
 	mockPostUsecase := new(usecase.MockPostUsecase)
 	mockUserUsecase := new(usecase.MockUserUsecase)

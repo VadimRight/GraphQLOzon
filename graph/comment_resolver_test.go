@@ -4,9 +4,10 @@ package graph
 import (
 	"context"
 	"testing"
-	"github.com/stretchr/testify/assert"
-	"github.com/VadimRight/GraphQLOzon/model"
+
 	"github.com/VadimRight/GraphQLOzon/internal/usecase"
+	"github.com/VadimRight/GraphQLOzon/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestComments(t *testing.T) {
@@ -57,4 +58,3 @@ func TestComment(t *testing.T) {
 	mockCommentUsecase.AssertExpectations(t)
 	mockUserUsecase.AssertExpectations(t)
 }
-

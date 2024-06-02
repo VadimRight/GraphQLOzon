@@ -3,65 +3,66 @@ package config
 import (
 	"log"
 	"os"
-	"github.com/joho/godotenv"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 // Тип общей конфигурации
 type Config struct {
-	Env *EnvConfig
+	Env      *EnvConfig
 	Postgres *PostgresConfig
-	Server *ServerConfig
-	Storage *StorageTypeConfig 
+	Server   *ServerConfig
+	Storage  *StorageTypeConfig
 }
 
-// Тип конифурации типа хранилища, применяемого при запуске сервера 
+// Тип конифурации типа хранилища, применяемого при запуске сервера
 type StorageTypeConfig struct {
 	StorageType string
 }
 
 // Тип конфигурации пути до .env и его типа (local или docker)
 type EnvConfig struct {
-	Env string 
+	Env     string
 	EnvPath string
 }
 
 // Тип конфигурации базы данных Postgres
-type PostgresConfig struct {	
-	PostgresPort string 
-	PostgresHost string 
-	DatabaseName string 
-	PostgresUser string 
-	PostgresPassword string 
+type PostgresConfig struct {
+	PostgresPort     string
+	PostgresHost     string
+	DatabaseName     string
+	PostgresUser     string
+	PostgresPassword string
 }
 
 // Тип конфигурации сервера
 type ServerConfig struct {
-	ServerAddress string 
-	ServerPort string 
-	Timeout           time.Duration 
-	IdleTimeout       time.Duration
-	RunMode string
-	JWTSecret string
+	ServerAddress string
+	ServerPort    string
+	Timeout       time.Duration
+	IdleTimeout   time.Duration
+	RunMode       string
+	JWTSecret     string
 }
 
-//  Функция загрузки конфигурации пути к файлу .env и типу .env (локальный или докер)
+// Функция загрузки конфигурации пути к файлу .env и типу .env (локальный или докер)
 func LoadConfig() *Config {
 	envConfig := loadEnvConfig()
 	postgresConfig := loadPostgresConfig()
-	serverConfig := loadServerConfig()	
+	serverConfig := loadServerConfig()
 	storageTypeConfig := loadStorageTypeConfig()
 	log := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
 	log.Printf("Server Port: %s", serverConfig.ServerPort)
 	log.Printf("Postgres Port: %s", postgresConfig.PostgresPort)
 	log.Printf("Env var: %s", envConfig.Env)
 	log.Printf("StorageType: %s", storageTypeConfig.StorageType)
-	return &Config {
-		Env: envConfig,
+	return &Config{
+		Env:      envConfig,
 		Postgres: postgresConfig,
-		Server: serverConfig,
-		Storage: storageTypeConfig,
-	}	
+		Server:   serverConfig,
+		Storage:  storageTypeConfig,
+	}
 }
 
 // Приватная функция загрузки конфигурации пути к файлу .env и типу .env (локальный или докер)
@@ -70,7 +71,7 @@ func loadEnvConfig() *EnvConfig {
 	err := godotenv.Load("env-files/.env")
 	if err != nil {
 		log.Fatalf("%s %v", opt, err)
-	}		
+	}
 
 	log := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
 	configPath := os.Getenv("CONFIG_PATH")
@@ -85,8 +86,8 @@ func loadEnvConfig() *EnvConfig {
 	if !ok {
 		log.Fatal("Can't read ENV")
 	}
-	return &EnvConfig {
-		Env: envType, 
+	return &EnvConfig{
+		Env:     envType,
 		EnvPath: configPath,
 	}
 }
@@ -99,28 +100,38 @@ func loadPostgresConfig() *PostgresConfig {
 		log.Fatalf("%s: %v", opt, err)
 	}
 	log := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
-	
+
 	postgresPort, ok := os.LookupEnv("POSTGRES_PORT")
-	if !ok {log.Fatal("Can't read POSTGRES_PORT")}
+	if !ok {
+		log.Fatal("Can't read POSTGRES_PORT")
+	}
 
 	postgresHost, ok := os.LookupEnv("POSTGRES_HOST")
-	if !ok {log.Fatal("Can't read POSTGRES_HOST")}
+	if !ok {
+		log.Fatal("Can't read POSTGRES_HOST")
+	}
 
 	postgresPassword, ok := os.LookupEnv("POSTGRES_PASSWORD")
-	if !ok {log.Fatal("Can't read POSTGRES_PASSWORD")}
+	if !ok {
+		log.Fatal("Can't read POSTGRES_PASSWORD")
+	}
 
 	postgresDB, ok := os.LookupEnv("POSTGRES_DB")
-	if !ok {log.Fatal("Can't read POSTGRES_DB")}
-	
+	if !ok {
+		log.Fatal("Can't read POSTGRES_DB")
+	}
+
 	postgresUser, ok := os.LookupEnv("POSTGRES_USER")
-	if !ok {log.Fatal("Can't read POSTGRES_USER")}
-	
-	return &PostgresConfig {
-		PostgresPort: postgresPort,
-		PostgresHost: postgresHost,
-		DatabaseName: postgresDB,
-		PostgresUser: postgresUser,
-		PostgresPassword: postgresPassword,	
+	if !ok {
+		log.Fatal("Can't read POSTGRES_USER")
+	}
+
+	return &PostgresConfig{
+		PostgresPort:     postgresPort,
+		PostgresHost:     postgresHost,
+		DatabaseName:     postgresDB,
+		PostgresUser:     postgresUser,
+		PostgresPassword: postgresPassword,
 	}
 }
 
@@ -132,37 +143,53 @@ func loadServerConfig() *ServerConfig {
 		log.Fatalf("%s: %v", opt, err)
 	}
 	log := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
-	
+
 	serverPort, ok := os.LookupEnv("SERVER_PORT")
-	if !ok {log.Fatal("Can't read SERVER_PORT")}
-	
+	if !ok {
+		log.Fatal("Can't read SERVER_PORT")
+	}
+
 	serverAddr, ok := os.LookupEnv("SERVER_ADDR")
-	if !ok {log.Fatal("Can't read SERVER_ADDR")}
-	
+	if !ok {
+		log.Fatal("Can't read SERVER_ADDR")
+	}
+
 	serverRunMode, ok := os.LookupEnv("SERVER_RUN_MODE")
-	if !ok{	log.Fatalf("err while parsing run mode")}
-	
+	if !ok {
+		log.Fatalf("err while parsing run mode")
+	}
+
 	jwtSecret, ok := os.LookupEnv("JWT_SECRET")
-	if !ok {log.Fatal("Can't read SERVER_ADDR")}
+	if !ok {
+		log.Fatal("Can't read SERVER_ADDR")
+	}
 
 	timeout, ok := os.LookupEnv("TIMEOUT")
-	if !ok {log.Fatal("Can't read TIMEOUT")}
-	
+	if !ok {
+		log.Fatal("Can't read TIMEOUT")
+	}
+
 	timeoutTime, err := time.ParseDuration(timeout)
-	if err != nil {log.Fatalf("error while parsing timeout")}
-	
+	if err != nil {
+		log.Fatalf("error while parsing timeout")
+	}
+
 	idleTimeout, ok := os.LookupEnv("IDLE_TIMEOUT")
-	if !ok {log.Fatal("Can't read IDLE_TIMEOUT")}
-	
+	if !ok {
+		log.Fatal("Can't read IDLE_TIMEOUT")
+	}
+
 	idleTimeoutTime, err := time.ParseDuration(idleTimeout)
-	if err != nil {	log.Fatalf("error while parsing idle time")}
-	return &ServerConfig {
-		ServerAddress: serverAddr, 
-		ServerPort: serverPort,
-		RunMode: serverRunMode,
-		JWTSecret: jwtSecret,
-		Timeout: timeoutTime, 
-		IdleTimeout: idleTimeoutTime, 	
+	if err != nil {
+		log.Fatalf("error while parsing idle time")
+	}
+	return &ServerConfig{
+		ServerAddress: serverAddr,
+		ServerPort:    serverPort,
+		RunMode:       serverRunMode,
+		JWTSecret:     jwtSecret,
+		Timeout:       timeoutTime,
+		IdleTimeout:   idleTimeoutTime,
 	}
 }
 
@@ -173,8 +200,10 @@ func loadStorageTypeConfig() *StorageTypeConfig {
 		log.Fatalf("%s: %v", opt, err)
 	}
 	log := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime)
-	
+
 	storageType, ok := os.LookupEnv("STORAGE_TYPE")
-	if !ok {log.Fatal("Can't read STORAGE_TYPE")}
-	return &StorageTypeConfig{ StorageType:  storageType}
+	if !ok {
+		log.Fatal("Can't read STORAGE_TYPE")
+	}
+	return &StorageTypeConfig{StorageType: storageType}
 }

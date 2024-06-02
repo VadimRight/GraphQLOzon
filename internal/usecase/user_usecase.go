@@ -2,8 +2,9 @@ package usecase
 
 import (
 	"context"
-	"github.com/VadimRight/GraphQLOzon/model"
+
 	"github.com/VadimRight/GraphQLOzon/internal/service"
+	"github.com/VadimRight/GraphQLOzon/model"
 	"github.com/VadimRight/GraphQLOzon/storage"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -17,15 +18,15 @@ type UserUsecase interface {
 	GetPostsByUserID(ctx context.Context, userID string, limit, offset *int) ([]*model.Post, error)
 	GetCommentsByUserID(ctx context.Context, userID string) ([]*model.CommentResponse, error)
 	GetUserByID(ctx context.Context, userID string) (*model.User, error)
-	GenerateToken(ctx context.Context, userID string) (string, error)  // Добавлено
-	ValidateToken(ctx context.Context, token string) (*jwt.Token, error)  // Добавлено
+	GenerateToken(ctx context.Context, userID string) (string, error)    // Добавлено
+	ValidateToken(ctx context.Context, token string) (*jwt.Token, error) // Добавлено
 }
 
 type userUsecase struct {
-	storage        storage.Storage
-	commentUsecase CommentUsecase
+	storage         storage.Storage
+	commentUsecase  CommentUsecase
 	passwordService service.PasswordService
-	authService    service.AuthService
+	authService     service.AuthService
 }
 
 func NewUserUsecase(storage storage.Storage, commentUsecase CommentUsecase, passwordService service.PasswordService, authService service.AuthService) UserUsecase {

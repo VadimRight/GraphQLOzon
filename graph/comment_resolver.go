@@ -3,8 +3,9 @@ package graph
 import (
 	"context"
 	"errors"
-	"github.com/VadimRight/GraphQLOzon/model"
+
 	"github.com/VadimRight/GraphQLOzon/internal/middleware"
+	"github.com/VadimRight/GraphQLOzon/model"
 )
 
 // Метод получения всех комментариев

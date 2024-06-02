@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
-	"fmt"
-	"github.com/gin-gonic/gin"
+
 	"github.com/VadimRight/GraphQLOzon/internal/service"
+	"github.com/gin-gonic/gin"
 )
 
 type authString string

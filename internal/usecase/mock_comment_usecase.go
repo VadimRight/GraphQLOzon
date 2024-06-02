@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+
 	"github.com/VadimRight/GraphQLOzon/model"
 	"github.com/stretchr/testify/mock"
 )
@@ -34,4 +35,3 @@ func (m *MockCommentUsecase) GetCommentsByParentID(ctx context.Context, parentID
 	args := m.Called(ctx, parentID, limit, offset)
 	return args.Get(0).([]*model.CommentResponse), args.Error(1)
 }
-

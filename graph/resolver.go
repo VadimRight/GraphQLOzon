@@ -5,7 +5,7 @@ import (
 )
 
 // Тип Resolver, который ответственен за работу с данными в нашей схеме GraphQL
-type Resolver struct{
+type Resolver struct {
 	UserUsecase    usecase.UserUsecase
 	CommentUsecase usecase.CommentUsecase
 	PostUsecase    usecase.PostUsecase

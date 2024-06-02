@@ -6,9 +6,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/VadimRight/GraphQLOzon/internal/usecase"
 	"github.com/VadimRight/GraphQLOzon/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUsers(t *testing.T) {

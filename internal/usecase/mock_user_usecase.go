@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+
 	"github.com/VadimRight/GraphQLOzon/model"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/mock"
