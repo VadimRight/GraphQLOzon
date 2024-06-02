@@ -2,8 +2,9 @@ package storage
 
 import (
 	"context"
-	"github.com/VadimRight/GraphQLOzon/model"
+
 	"github.com/VadimRight/GraphQLOzon/internal/config"
+	"github.com/VadimRight/GraphQLOzon/model"
 )
 
 type Storage interface {

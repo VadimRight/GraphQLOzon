@@ -1,16 +1,17 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
+	"log"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/VadimRight/GraphQLOzon/graph"
-	"github.com/VadimRight/GraphQLOzon/storage"
 	"github.com/VadimRight/GraphQLOzon/internal/config"
-	"log"
-	"github.com/VadimRight/GraphQLOzon/internal/service"
 	"github.com/VadimRight/GraphQLOzon/internal/middleware"
+	"github.com/VadimRight/GraphQLOzon/internal/service"
 	"github.com/VadimRight/GraphQLOzon/internal/usecase"
+	"github.com/VadimRight/GraphQLOzon/storage"
+	"github.com/gin-gonic/gin"
 )
 
 // Функция инициализации сервера

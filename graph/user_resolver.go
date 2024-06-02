@@ -2,9 +2,10 @@ package graph
 
 import (
 	"context"
-	"github.com/VadimRight/GraphQLOzon/model"
 	"errors"
 	"fmt"
+
+	"github.com/VadimRight/GraphQLOzon/model"
 )
 
 // Функция получения всех пользователей
@@ -171,7 +172,7 @@ func (r *mutationResolver) LoginUser(ctx context.Context, username string, passw
 	}
 	fmt.Println(getUser.Password)
 	fmt.Println(password)
-	dismatch := r.UserUsecase.ComparePassword(getUser.Password, password) 
+	dismatch := r.UserUsecase.ComparePassword(getUser.Password, password)
 	if dismatch == true {
 		return nil, errors.New("Incorrect password")
 	}
