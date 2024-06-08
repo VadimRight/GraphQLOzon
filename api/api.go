@@ -2,7 +2,6 @@ package api
 
 import (
 	"log"
-
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/VadimRight/GraphQLOzon/graph"
