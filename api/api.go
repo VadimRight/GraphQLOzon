@@ -22,7 +22,6 @@ func InitServer(cfg *config.Config, storage storage.Storage) {
 	// Инициализация сервисов и middleware
 	authService := service.NewAuthService()
 	authMiddleware := middleware.NewAuthMiddleware(authService)
-
 	r.Use(authMiddleware.Handler())
 
 	r.POST("/graphql", graphqlHandler(storage, authService))
